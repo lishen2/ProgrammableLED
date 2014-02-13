@@ -1,0 +1,48 @@
+Partlist exported from C:/Documents and Settings/Administrator/eagle/SmartLED/1.sch at 2014-2-13 17:03:51
+
+Part Value                   Device                  Package                       Description                                                                         PROD_ID    VALUE       
+C1   10uF                    10UF-TANT               EIA3216                       10uF Tantalum SMT                                                                   CAP-00811  10uF        
+C2   10uF                    10UF-TANT               EIA3216                       10uF Tantalum SMT                                                                   CAP-00811  10uF        
+C3   0.1u                    C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C5   10u                     C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C6   20p                     C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C7   20p                     C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C8   0.1u                    C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C9   0.1u                    C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C10  0.1u                    C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C11  4.7u                    C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C13  20p                     C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+C14  20p                     C-EUC0603K              C0603K                        CAPACITOR, European symbol                                                                                 
+D1   MBRA140                 MBRA140                 SMA-DIODE                     40V, 1A Schottky rectifier                                                          DIO-08053              
+F1   500ma                   L-EUL2012C              L2012C                        INDUCTOR, European symbol                                                                                  
+IC2  STM32F10XCXT6           STM32F10XCXT6           TQFP48                        ST STM32F101/103 48pin LQFP                                                                                
+JP1  USB-MICROB              USB-MICROB              USB-MICROB                    USB Connectors                                                                      CONN-09505             
+JP2  M02PTH                  M02PTH                  1X02                          Standard 2-pin 0.1" header. Use with                                                                       
+JP3                          M06SIP                  1X06                          Header 6                                                                                                   
+JP4                          M03PTH                  1X03                          Header 3                                                                                                   
+JP5  M02PTH                  M02PTH                  1X02                          Standard 2-pin 0.1" header. Use with                                                                       
+JP6                          M07                     1X07                          Header 7                                                                                                   
+LED1 LED-TRICOLOR-5050NO_IC  LED-TRICOLOR-5050NO_IC  LED-TRICOLOR-5050                                                                                                                        
+LED2 LED-TRICOLOR-5050NO_IC  LED-TRICOLOR-5050NO_IC  LED-TRICOLOR-5050                                                                                                                        
+R1   22R                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R2   22R                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R3   10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R4   10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R5   10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R6   1M                      R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R7   1.5K                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R8   10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R9   10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R10  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R11  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R12  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R13  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R14  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R15  470R                    R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+R16  10K                     R-EU_R0603              R0603                         RESISTOR, European symbol                                                                                  
+S1   SWITCH-MOMENTARY-2SMD-4 SWITCH-MOMENTARY-2SMD-4 TACTILE_SWITCH_TALL           Various NO switches- pushbuttons, reed, etc                                                                
+U1   MIC5219 3.3V            V_REG_MIC52193.3V       SOT23-5                       V_REG MIC5219                                                                       VREG-09872 MIC5219 3.3V
+Y1   8MHZ                    CRYSTAL5X3              CRYSTAL-SMD-5X3               Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00534                        
+Y2   32768                   CRYSTALEPSONMC146       CRYSTAL-32KHZ-SMD_EPSON_MC146 Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00534                        
+Z1                           VARISTOR-0603           0603-RES                      Varistor                                                                                                   
+Z2                           VARISTOR-0603           0603-RES                      Varistor                                                                                                   
