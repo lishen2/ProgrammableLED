@@ -12241,7 +12241,6 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <part name="SUPPLY7" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 <part name="GND8" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND9" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="SUPPLY4" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 <part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="10K"/>
 <part name="Y1" library="SparkFun-FreqCtrl" deviceset="CRYSTAL" device="5X3" value="8MHZ"/>
 <part name="C6" library="rcl" deviceset="C-EU" device="C0603K" value="20p"/>
@@ -12289,6 +12288,7 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <part name="JP6" library="SparkFun-Connectors" deviceset="M07" device=""/>
 <part name="SUPPLY12" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 <part name="GND17" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
+<part name="SUPPLY4" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -12328,9 +12328,8 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <instance part="JP3" gate="G$1" x="-22.86" y="-20.32" rot="MR180"/>
 <instance part="SUPPLY7" gate="G$1" x="-15.24" y="-2.54"/>
 <instance part="GND8" gate="1" x="-15.24" y="-33.02"/>
-<instance part="GND9" gate="1" x="45.72" y="-63.5"/>
-<instance part="SUPPLY4" gate="G$1" x="45.72" y="-43.18"/>
-<instance part="R5" gate="G$1" x="45.72" y="-48.26" rot="R90"/>
+<instance part="GND9" gate="1" x="48.26" y="-71.12"/>
+<instance part="R5" gate="G$1" x="48.26" y="-63.5" rot="R90"/>
 <instance part="Y1" gate="G$1" x="203.2" y="35.56" rot="R270"/>
 <instance part="C6" gate="G$1" x="210.82" y="40.64" rot="R90"/>
 <instance part="C7" gate="G$1" x="210.82" y="30.48" rot="R90"/>
@@ -12379,6 +12378,7 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <instance part="JP6" gate="G$1" x="-22.86" y="-76.2" rot="MR180"/>
 <instance part="SUPPLY12" gate="G$1" x="-5.08" y="-71.12"/>
 <instance part="GND17" gate="1" x="-5.08" y="-88.9"/>
+<instance part="SUPPLY4" gate="G$1" x="48.26" y="-53.34"/>
 </instances>
 <busses>
 </busses>
@@ -12495,12 +12495,6 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <wire x1="-15.24" y1="-53.34" x2="-15.24" y2="-55.88" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="JP5" gate="G$1" pin="2"/>
-<wire x1="43.18" y1="-58.42" x2="45.72" y2="-58.42" width="0.1524" layer="91"/>
-<pinref part="GND9" gate="1" pin="GND"/>
-<wire x1="45.72" y1="-58.42" x2="45.72" y2="-60.96" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="GND15" gate="1" pin="GND"/>
 <wire x1="213.36" y1="12.7" x2="213.36" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="C13" gate="G$1" pin="2"/>
@@ -12518,6 +12512,10 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <pinref part="JP6" gate="G$1" pin="7"/>
 <wire x1="-17.78" y1="-86.36" x2="-5.08" y2="-86.36" width="0.1524" layer="91"/>
 <pinref part="GND17" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="R5" gate="G$1" pin="1"/>
+<pinref part="GND9" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="USB_VCC" class="0">
@@ -12586,10 +12584,6 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <pinref part="IC2" gate="POWER" pin="VDD_2"/>
 <wire x1="45.72" y1="-5.08" x2="38.1" y2="-5.08" width="0.1524" layer="91"/>
 <junction x="38.1" y="-5.08"/>
-</segment>
-<segment>
-<pinref part="SUPPLY4" gate="G$1" pin="3.3V"/>
-<pinref part="R5" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <pinref part="SUPPLY8" gate="G$1" pin="3.3V"/>
@@ -12665,6 +12659,12 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 <pinref part="JP6" gate="G$1" pin="1"/>
 <wire x1="-17.78" y1="-71.12" x2="-5.08" y2="-71.12" width="0.1524" layer="91"/>
 <pinref part="SUPPLY12" gate="G$1" pin="3.3V"/>
+</segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="1"/>
+<wire x1="43.18" y1="-55.88" x2="48.26" y2="-55.88" width="0.1524" layer="91"/>
+<pinref part="SUPPLY4" gate="G$1" pin="3.3V"/>
+<wire x1="48.26" y1="-55.88" x2="48.26" y2="-53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -12938,18 +12938,17 @@ CAP-00811- 16V 10% (EIA-3216)</description>
 </net>
 <net name="BOOT0" class="0">
 <segment>
-<pinref part="JP5" gate="G$1" pin="1"/>
-<wire x1="43.18" y1="-55.88" x2="45.72" y2="-55.88" width="0.1524" layer="91"/>
-<pinref part="R5" gate="G$1" pin="1"/>
-<wire x1="45.72" y1="-55.88" x2="45.72" y2="-53.34" width="0.1524" layer="91"/>
-<junction x="45.72" y="-55.88"/>
-<wire x1="45.72" y1="-55.88" x2="55.88" y2="-55.88" width="0.1524" layer="91"/>
-<label x="48.26" y="-55.88" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="IC2" gate="RESET" pin="BOOT0"/>
 <wire x1="187.96" y1="73.66" x2="200.66" y2="73.66" width="0.1524" layer="91"/>
 <label x="190.5" y="73.66" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="2"/>
+<pinref part="R5" gate="G$1" pin="2"/>
+<wire x1="48.26" y1="-58.42" x2="43.18" y2="-58.42" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="-58.42" x2="55.88" y2="-58.42" width="0.1524" layer="91"/>
+<junction x="48.26" y="-58.42"/>
+<label x="50.8" y="-58.42" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$4" class="0">

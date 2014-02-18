@@ -27,7 +27,11 @@
 
 当前进度
 --------
-第一版PCB设计完成。
+第一版PCB制作完成。
+
+开发博客
+--------
+<http://blog.sina.com.cn/lgeek>
 
 Programmable LED
 ===============
@@ -58,4 +62,9 @@ Hardware
 
 Current progress
 ---------------
- Finished first PCB design.
+Finished first hardware(first version).
+
+Development blog
+---------------
+<http://lsgeek.blogspot.com>
+
