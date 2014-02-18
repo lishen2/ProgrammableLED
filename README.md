@@ -1,7 +1,7 @@
 可编程的LED
 ===============
 可编程的LED是一个小巧的电路板，有两颗全彩LED灯。它提供了一个Mmacro USB接口，可以连接到电脑，通过简单编程控制LED灯的闪烁。
-![image](https://github.com/lishen2/ProgrammableLED/blob/master/images/IMG_0546.png)
+![image](https://raw.github.com/lishen2/ProgrammableLED/master/images/IMG_0546.png)
 
 设计目标
 --------
