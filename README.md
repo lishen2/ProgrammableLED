@@ -28,7 +28,8 @@
 
 当前进度
 --------
-第一版PCB制作完成。
+20120217: 第一版PCB制作完成
+20120220: 编写代码，STM32的USB驱动示例代码很烂，作为程序员不忍直视。
 
 开发博客
 --------
@@ -63,7 +64,8 @@ Hardware
 
 Current progress
 ---------------
-Finished first hardware(first version).
+20120217: Finished first PCB.
+20120220: Working on the code, STM32's USB Driver is horrible. 
 
 Development blog
 ---------------
