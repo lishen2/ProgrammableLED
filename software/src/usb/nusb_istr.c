@@ -1,47 +1,118 @@
 #include <stdio.h>
 #include "stm32f10x.h"
-#include "nusb_intf.h"
 #include "usb_regs.h"
-#include "nusb_conf.h"
+#include "nusb_intf.h"
+#include "nusb_utils.h"
+#include "nusb_core.h"
+#include "nusb_pwr.h"
 
-vu16 g_wIstr;
+static void _LP_CTR(void)
+{
+	vu16 wIstr;
+	vu16 EPVal;
+	vu8  EPIndex;
+	
+	/* stay in loop while pending interrupts */
+	while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
+	{
+		/* extract highest priority endpoint number */
+		EPIndex = (uint8_t)(wIstr & ISTR_EP_ID);	
+
+		/* Decode and service control endpoint interrupt */
+		if (0 == EPIndex)
+		{
+
+            g_SaveRxStatus = _GetENDPOINT(ENDP0);
+	        g_SaveTxStatus = g_SaveRxStatus & EPTX_STAT;
+	        g_SaveRxStatus &=  EPRX_STAT;	
+        
+		    /* DIR = 0 implies that (EP_CTR_TX = 1) always  */
+            if ((wIstr & ISTR_DIR) == 0)
+            {
+                _ClearEP_CTR_TX(ENDP0);
+                NUSB_EP0_InProcess();
+            }
+            else 
+            {
+                EPVal = _GetENDPOINT(ENDP0);
+				_ClearEP_CTR_RX(ENDP0);
+                
+    		    if ((EPVal&EP_SETUP) != 0)
+                {
+                    NUSB_EP0_SetupProcess();
+                }
+                else
+                {
+                    NUSB_EP0_OutProcess();
+                }
+	        }
+
+            //in case of racing condition, set rx and tx togither
+            _SetEPRxTxStatus(ENDP0, g_SaveRxStatus, g_SaveTxStatus);
+			printf("RX [%x] TX [%x]\r\n", g_SaveRxStatus, g_SaveTxStatus);
+		}
+		/* Decode and service non control endpoints interrupt  */
+		else 
+		{
+			EPVal = _GetENDPOINT(EPIndex);
+
+			if ((EPVal & EP_CTR_RX) != 0)
+			{
+				/* clear int flag */
+				_ClearEP_CTR_RX(EPIndex);
+				/* call OUT service function */
+				(*(g_devOps.Ep_IN)[EPIndex-1])();			
+			}
+			
+			if ((EPVal & EP_CTR_TX) != 0)
+			{
+				/* clear int flag */
+				_ClearEP_CTR_TX(EPIndex);
+				/* call IN service function */
+				(*(g_devOps.Ep_IN)[EPIndex-1])();
+			}
+		} //else
+	} //while
+
+	return;
+}
 
 void NUSB_LP_INT(void)
 {
-	g_wIstr = _GetISTR();
+	vu16 wIstr;
+	wIstr = _GetISTR();
 
-	#if (NUSB_IMR_MSK & ISTR_CTR)
-	if (g_wIstr & ISTR_CTR)
+	if (wIstr & ISTR_CTR)
 	{
 		_SetISTR((uint16_t)CLR_CTR);
-		printf("CTR occur\r\n");
+		_LP_CTR();
 	}
-	#endif  
-	#if (NUSB_IMR_MSK & ISTR_RESET)
-	if (g_wIstr & ISTR_RESET)
+	if (wIstr & ISTR_RESET)
 	{
 		_SetISTR((uint16_t)CLR_RESET);
 		g_devOps.Reset();
-		printf("RESET occur\r\n");
+
+		/* Set the device to response on default address
+		   and enable device */
+		NUSB_SetDeviceAddress(0);
+//		g_DevStatus = NUSB_ATTACHED;
+        g_SetupStatus.ControlState = NUSB_STAT_WAIT_SETUP;
+
+		printf("RESET\r\n");
 	}
-	#endif
-	#if (NUSB_IMR_MSK & ISTR_WKUP)
-	if (g_wIstr & ISTR_WKUP)
+	if (wIstr & ISTR_WKUP)
 	{
 		_SetISTR((uint16_t)CLR_WKUP);
-		//Resume(RESUME_EXTERNAL);
-		printf("WAKEUP occur\r\n");
+		NUSB_Resume();
+		printf("WAKEUP\r\n");
 	}
-	#endif
-	#if (NUSB_IMR_MSK & ISTR_SUSP)
-	if (g_wIstr & ISTR_SUSP)
+	if (wIstr & ISTR_SUSP)
 	{
 		//TODO, why first suspend then clear SUSP flag
-		//Suspend();
-		_SetISTR((uint16_t)CLR_SUSP);
-		printf("SUSPEND occur\r\n");
+		NUSB_Suspend();
+		_SetISTR((uint16_t)CLR_SUSP); 
+        printf("SUSPEND\r\n");
 	}
-	#endif
 
 	return;
 }

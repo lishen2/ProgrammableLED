@@ -16,7 +16,6 @@
 /* tx buffer base address */
 #define NUSB_ENDP1_TXADDR        (0x98)
 
-
 /* EP2  */
 /* Rx buffer base address */
 #define NUSB_ENDP2_RXADDR        (0xD8)
