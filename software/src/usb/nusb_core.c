@@ -8,6 +8,7 @@
 #include "nusb_utils.h"
 #include "nusb_core.h"
 #include "nusb_pwr.h"
+#include "nusb_assert.h"
 
 #define Usb_rLength Usb_wLength
 #define Usb_rOffset Usb_wOffset
@@ -35,35 +36,32 @@ vu16 g_SaveTxStatus;
 #define SetEP0TxStatusLater(ST) g_SaveTxStatus = ST
 #define SetEP0RxStatusLater(ST) g_SaveRxStatus = ST
 
-//device status
-//NUSB_DEVICE_STATE g_DevStatus = NUSB_UNCONNECTED;
-/*
-NUSB_DEVICE_STATE NUSB_GetStatus(void)
-{
-	return g_DevStatus;
-}
-*/
 void NUSB_init(void)
 {
 	g_devOps.Init();
 
     NUSB_PowerOn();
-    
-//	g_DevStatus = NUSB_UNCONNECTED;
+
 	return;
 }
 
 void NUSB_EP0_InProcess(void)
-{
+{	
     switch(g_SetupStatus.ControlState)
     {
         /* read ack from host, for now no more data to send.
            so stall the tx direction */
-        case NUSB_STAT_SEND_DESCRIPTOR_WAIT_STATUS_IN:
+        case NUSB_STAT_SEND_DESCRIPTOR_WAIT_ACK:
         {
             SetEP0TxStatusLater(EP_TX_STALL);
             break;
         }
+		case NUSB_STAT_SET_ADDRESS_WAIT_ACK:
+		{
+			_SetDADDR(g_Request.USBwValue0 | DADDR_EF);
+			printf(" Do SETADDR\r\n");
+			break;
+		}	
     }
 
     return;
@@ -71,15 +69,27 @@ void NUSB_EP0_InProcess(void)
 
 void NUSB_EP0_OutProcess(void)
 {
-    printf("EP0 Out\r\n");
+	return;
 }
 
-void _sendData(u8* buf, u32 length)
+/* for now all sending data are smaller then EP0 TX buffer, so we allways send data in one go */
+void NUSB_EP0SendData(u8* buf, u32 length)
 {
-    UserToPMABufferCopy(buf, GetEPTxAddr(ENDP0), length);
-    SetEPTxCount(ENDP0, length);
-    SetEPTxStatus(ENDP0, EP_TX_VALID);
-    SetEP0TxStatusLater(EP_TX_VALID);
+	if (0 == length)
+	{
+		SetEPTxCount(ENDP0, 0);
+	    SetEP0TxStatusLater(EP_TX_VALID);	
+	}
+	else 
+	{
+		NUSB_ASSERT(length <= g_devConf.EP0BufferSize);	
+	
+	    UserToPMABufferCopy(buf, GetEPTxAddr(ENDP0), length);
+	    SetEPTxCount(ENDP0, length);
+	    SetEPTxStatus(ENDP0, EP_TX_VALID);
+	    SetEP0TxStatusLater(EP_TX_VALID);	
+	}
+
     return;
 }
 
@@ -116,30 +126,36 @@ static NUSB_RESULT _req_getDescripter(NUSB_REQUEST* request)
     {
         length = g_devOps.GetDeviceDescriptorLength();
         descBuf = g_devOps.GetDeviceDescriptor();
-		printf("Get device descript request\r\n");
+		printf("Dev\r\n");
     }
     else if (request->USBwValue1 == CONFIG_DESCRIPTOR)
     {
         length = g_devOps.GetConfigDescriptorLength();
         descBuf = g_devOps.GetConfigDescriptor();
-		printf("Get configuration descript request\r\n");
+		printf("Conf\r\n");
     }
     else if (request->USBwValue1 == STRING_DESCRIPTOR)
     {
         length = g_devOps.GetStringDescriptorLength(request->USBwValue0);
         descBuf = g_devOps.GetStringDescriptor(request->USBwValue0);
-		printf("Get string descript request\r\n");
+		printf("Str[%hhu]\r\n", request->USBwValue0);
     } else 
 	{
+		printf("UNKNOWN\r\n");
     	length = 0;
     	descBuf = NULL;		
 	}
 
 	if (NULL != descBuf && 0 != length){
-		_sendData(descBuf, length);
+
+		if (length > request->USBwLength){
+			length = request->USBwLength;
+		}
+
+		NUSB_EP0SendData(descBuf, length);
 		resault = NUSB_SUCCESS;
-        g_SetupStatus.ControlState = NUSB_STAT_SEND_DESCRIPTOR_WAIT_STATUS_IN;
-        printf("Send descriptor [%u].\r\n", length);
+        g_SetupStatus.ControlState = NUSB_STAT_SEND_DESCRIPTOR_WAIT_ACK;
+        printf(" SendDesc[%u]\r\n", length);
 	}
 	else
 	{
@@ -151,9 +167,44 @@ static NUSB_RESULT _req_getDescripter(NUSB_REQUEST* request)
 
 static NUSB_RESULT _req_setAddress(NUSB_REQUEST* request)
 {
-    
-    printf("Set Address.\r\n");
-    return NUSB_SUCCESS;
+	NUSB_RESULT resault;
+
+	if ((request->USBwValue0 > 127) || (request->USBwValue1 != 0) || (request->USBwIndex != 0))
+	/* Device Address should be 127 or less*/
+	{
+		g_SetupStatus.ControlState = NUSB_STALLED;
+		resault = NUSB_ERROR;
+		printf("FAILED\r\n");
+	}
+	// address saved in global variables, set address when recive ack from host 
+	else
+	{
+		g_SetupStatus.ControlState = NUSB_STAT_SET_ADDRESS_WAIT_ACK;
+		NUSB_EP0SendData(NULL, 0);
+		resault = NUSB_SUCCESS;
+		printf("SUCCESS\r\n");
+	}
+	
+    return resault;
+}
+
+static NUSB_RESULT _req_setConfiguration(NUSB_REQUEST* request)
+{
+	if ((request->USBwValue0 <= g_devConf.TotalConfiguration) 
+		&& (request->USBwValue1 == 0)
+		&& (request->USBwIndex == 0)) /*call Back usb spec 2.0*/
+	{
+		g_SetupStatus.CurrentConfiguration = request->USBwValue0;
+		g_devOps.SetConfiguration();
+
+		NUSB_EP0SendData(NULL, 0);
+
+		return NUSB_SUCCESS;
+	}
+	else
+	{
+		return NUSB_UNSUPPORT;
+	}
 }
 
 static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
@@ -164,18 +215,22 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
     {
         case GET_STATUS:
         {
+			printf("GET_STATUS\r\n");
             break;
         }
         case CLEAR_FEATURE:
         {
+			printf("CLEAR_FEATURE\r\n");
             break;
         }
         case SET_FEATURE:
         {
+			printf("SETUP_FEATURE\r\n");
             break;
         }
         case SET_ADDRESS:
         {
+			printf("SET_ADDRESS-");
             if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
             {
                 resault = _req_setAddress(request);    
@@ -184,6 +239,7 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         }
         case GET_DESCRIPTOR:
         {
+			printf("GET_DESC-");
             if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
             {
                 resault = _req_getDescripter(request);    
@@ -192,26 +248,36 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         }
         case SET_DESCRIPTOR:
         {
+			printf("SET_DESC\r\n");
             break;
         }            
         case GET_CONFIGURATION:
         {
+			printf("GET_CONF\r\n");
             break;
         }            
         case SET_CONFIGURATION:
         {
+			printf("SET_CONF\r\n");
+			if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
+            {
+                resault = _req_setConfiguration(request);    
+            }
             break;
         }            
         case GET_INTERFACE:
         {
+			printf("GET_INTF\r\n");
             break;
         }            
         case SET_INTERFACE:
         {
+			printf("SET_INTF\r\n");
             break;
         }            
         default:
         {
+			printf("UN_REQ\r\n");
             resault = NUSB_UNSUPPORT;
             break;
         }        
@@ -220,9 +286,9 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
     return resault;
 }
 
-static NUSB_RESULT _classRequest(void)
-{
-	return NUSB_SUCCESS;
+static NUSB_RESULT _classRequest(NUSB_REQUEST* request)
+{	
+	return g_devOps.ClassSetup(request);
 }
 
 void NUSB_EP0_SetupProcess(void)
@@ -237,17 +303,20 @@ void NUSB_EP0_SetupProcess(void)
     {
         case STANDARD_REQUEST:
         {
+			printf(" ST:");
             resault = _standardRequest(&g_Request);
             break;
         }
         case CLASS_REQUEST:
         {
-            resault = _classRequest();
+			printf(" CLASS:");
+            resault = _classRequest(&g_Request);
             break;
         }
         case VENDOR_REQUEST:
         default:
         {
+			printf(" UNKONWN\r\n");
             resault = NUSB_UNSUPPORT;
             break;
         }

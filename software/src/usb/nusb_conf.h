@@ -4,9 +4,6 @@
 
 #define NUSB_BTABLE_ADDRESS      (0x00)
 
-//max endpoint number we used  (0-2)
-#define NUSB_MAX_ENDP_NUM        3
-
 /* EP0  */
 /* rx/tx buffer base address */
 #define NUSB_ENDP0_RXADDR        (0x18)
@@ -28,6 +25,11 @@
 /* ISTR events */
 /* mask defining which events has to be handled by the device application software */
 #define NUSB_IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_RESETM )
+
+/* The number of configurations */
+#define NUSB_TOTAL_CONFIGURATION     1
+
+#define NUSB_MAX_LUN               1
 
 
 #endif /* __USB_CONF_H */
