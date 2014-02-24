@@ -86,7 +86,6 @@ void NUSB_EP0SendData(u8* buf, u32 length)
 	
 	    UserToPMABufferCopy(buf, GetEPTxAddr(ENDP0), length);
 	    SetEPTxCount(ENDP0, length);
-	    SetEPTxStatus(ENDP0, EP_TX_VALID);
 	    SetEP0TxStatusLater(EP_TX_VALID);	
 	}
 
@@ -114,6 +113,54 @@ static void _parserSetupMsg(NUSB_REQUEST* request)
     request->USBwLength = *pBuf.w; /* wLength */
 
     return;
+}
+
+static NUSB_RESULT _req_getStatus(NUSB_REQUEST* request)
+{
+    NUSB_RESULT resault = NUSB_SUCCESS;
+	u16 feature;
+	u8 EPNum;
+
+   /* GET STATUS for Device*/
+    if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT)
+        && (request->USBwIndex == 0))
+    {
+		feature = g_devConf.DeviceFeature;
+    }
+    /* GET STATUS for Interface*/
+    else if (INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
+    {
+		feature = 0;	
+    }
+    /* GET STATUS for EndPoint*/
+    else if (ENDPOINT_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
+    {
+		EPNum = request->USBwIndex0 & 0x0f;
+		
+		feature = 0;
+		if (0 != request->USBwIndex0 & 0x80)
+		{
+			if (_GetTxStallStatus(EPNum)){
+				feature = 0x01;	
+			}
+		}
+		else
+		{
+			if (_GetRxStallStatus(EPNum)){
+				feature = 0x01;	
+			}
+		}
+	
+    } else {
+		resault = NUSB_ERROR;
+	}
+
+	if (NUSB_SUCCESS == resault)
+	{
+		NUSB_EP0SendData((u8*)&feature, sizeof(feature));
+	}
+	
+	return resault;	
 }
 
 static NUSB_RESULT _req_getDescripter(NUSB_REQUEST* request)
@@ -216,6 +263,7 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         case GET_STATUS:
         {
 			printf("GET_STATUS\r\n");
+			resault = _req_getStatus(request);
             break;
         }
         case CLEAR_FEATURE:
@@ -225,7 +273,7 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         }
         case SET_FEATURE:
         {
-			printf("SETUP_FEATURE\r\n");
+			printf("SET_FEATURE\r\n");
             break;
         }
         case SET_ADDRESS:
@@ -286,11 +334,6 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
     return resault;
 }
 
-static NUSB_RESULT _classRequest(NUSB_REQUEST* request)
-{	
-	return g_devOps.ClassSetup(request);
-}
-
 void NUSB_EP0_SetupProcess(void)
 {
     u8 bmRequestType;
@@ -310,7 +353,7 @@ void NUSB_EP0_SetupProcess(void)
         case CLASS_REQUEST:
         {
 			printf(" CLASS:");
-            resault = _classRequest(&g_Request);
+            resault = g_devOps.ClassSetup(&g_Request);
             break;
         }
         case VENDOR_REQUEST:

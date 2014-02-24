@@ -48,13 +48,13 @@ NUSB_DEVICE_OPS g_devOps =
 	    NOP_Process,   /* EP7_IN_Callback */
   	},
 	{
-		NOP_Process,	/* EP1_IN_Callback */
-		NOP_Process,	/* EP2_IN_Callback */
-		NOP_Process,	/* EP3_IN_Callback */
-		NOP_Process,	/* EP4_IN_Callback */
-		NOP_Process,	/* EP5_IN_Callback */
-		NOP_Process,	/* EP6_IN_Callback */
-		NOP_Process,	/* EP7_IN_Callback */
+		NOP_Process,	/* EP1_OUT_Callback */
+		NOP_Process,	/* EP2_OUT_Callback */
+		NOP_Process,	/* EP3_OUT_Callback */
+		NOP_Process,	/* EP4_OUT_Callback */
+		NOP_Process,	/* EP5_OUT_Callback */
+		NOP_Process,	/* EP6_OUT_Callback */
+		NOP_Process,	/* EP7_OUT_Callback */
 	},
 };
 
@@ -63,6 +63,7 @@ NUSB_DEVICE_CONFIGURATION g_devConf =
     NUSB_IMR_MSK,
     NUSB_ENDP0_BUFFER_SIZE,
 	NUSB_TOTAL_CONFIGURATION,
+	NUSB_DEVICE_FEATURE_NO_FEATURE
 };
 
 static void _Init(void)
@@ -179,29 +180,34 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 		{
 			if ((INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
 				&& (request->USBwValues.w == 0)
-      			&&(request->USBwIndexs.w == 0) 
+      			&& (request->USBwIndexs.w == 0) 
 				&& (request->USBwLengths.w == 0x01))
 			{
 				printf("GET_MAX_LUN\r\n");
 				NUSB_EP0SendData(&g_MaxLun, sizeof(g_MaxLun));
 				resault	= NUSB_SUCCESS;
 			}
+
+			break;
 		}
 		case NUSB_CLASS_MASS_STORAGE_RESET:
 		{
 			if ((INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
 				&& (request->USBwValues.w == 0)
-      			&&(request->USBwIndexs.w == 0) 
+      			&& (request->USBwIndexs.w == 0) 
 				&& (request->USBwLengths.w == 0x00))
 			{
 				printf("MS_RESET\r\n");
 				NUSB_EP0SendData(NULL, 0);
 				resault	= NUSB_SUCCESS;
-			}		
+			}
+			
+			break;		
 		}
 		default:
 		{
 			resault = NUSB_UNSUPPORT;
+			break;
 		}	
 	}
 

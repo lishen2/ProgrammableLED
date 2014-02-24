@@ -1,29 +1,16 @@
 #ifndef _NUSB_INTF_H_
 #define _NUSB_INTF_H_
 
+#define NUSB_DEVICE_FEATURE_NO_FEATURE    0x00
+#define NUSB_DEVICE_FEATURE_SELF_POWERED  0x01
+#define NUSB_DEVICE_FEATURE_REMOTE_WAKEUP 0x02
+
 typedef enum _RESULT
 {
   NUSB_SUCCESS = 0,    /* Process successfully */
   NUSB_ERROR,
   NUSB_UNSUPPORT
 } NUSB_RESULT;
-
-/****************************************************************
-** interfaces that USB module explode to user programme
-*****************************************************************/
-
-//initialize USB module 
-void NUSB_init(void);
-
-//low priority interrupt handler
-void NUSB_LP_INT(void);
-
-//send data through EP0
-void NUSB_EP0SendData(u8* buf, u32 length);
-
-/****************************************************************
-** interfaces that user programme must implement
-*****************************************************************/
 
 typedef union
 {
@@ -66,16 +53,35 @@ typedef struct _DEVICE_OPS
 	void (*Ep_OUT[7])(void);   /* called when host send data to ep 1~7 */
 }NUSB_DEVICE_OPS;
 
-//device operations
-extern NUSB_DEVICE_OPS g_devOps;
-
 typedef struct _DEVICE_CONFIGURATION
 {
     u16 IMR_MSK;
     u16 EP0BufferSize;
 	u8  TotalConfiguration;
+	u16 DeviceFeature;
 }NUSB_DEVICE_CONFIGURATION;
 
+/****************************************************************
+** interfaces that USB module explode to user programme
+*****************************************************************/
+
+//initialize USB module 
+void NUSB_init(void);
+
+//low priority interrupt handler
+void NUSB_LP_INT(void);
+
+//send data through EP0
+void NUSB_EP0SendData(u8* buf, u32 length);
+
+/****************************************************************
+** interfaces that user programme must implement
+*****************************************************************/
+
+//device operations
+extern NUSB_DEVICE_OPS g_devOps;
+
+//device configuration
 extern NUSB_DEVICE_CONFIGURATION g_devConf;
 
 #endif

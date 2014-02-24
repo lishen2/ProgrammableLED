@@ -29,7 +29,7 @@
 /* The number of configurations */
 #define NUSB_TOTAL_CONFIGURATION     1
 
-#define NUSB_MAX_LUN               1
+#define NUSB_MAX_LUN                 0 /* zero means one logic unit */
 
 
 #endif /* __USB_CONF_H */

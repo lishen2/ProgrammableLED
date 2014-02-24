@@ -23,42 +23,7 @@ static void _LP_CTR(void)
 		{
             g_SaveRxStatus = _GetENDPOINT(ENDP0);
 	        g_SaveTxStatus = g_SaveRxStatus & EPTX_STAT;
-	        g_SaveRxStatus &=  EPRX_STAT;	
- 
-#if 0
-      if ((wIstr & ISTR_DIR) == 0)
-      {
-        /* DIR = 0 */
-
-        /* DIR = 0      => IN  int */
-        /* DIR = 0 implies that (EP_CTR_TX = 1) always  */
-
-        _ClearEP_CTR_TX(ENDP0);
-        NUSB_EP0_InProcess();
-
-      }
-      else
-      {
-        /* DIR = 1 */
-
-        /* DIR = 1 & CTR_RX       => SETUP or OUT int */
-        /* DIR = 1 & (CTR_TX | CTR_RX) => 2 int pending */
-
-        EPVal = _GetENDPOINT(ENDP0);
-        
-        if ((EPVal &EP_SETUP) != 0)
-        {
-          _ClearEP_CTR_RX(ENDP0); /* SETUP bit kept frozen while CTR_RX = 1 */
-          NUSB_EP0_SetupProcess();
-        }
-
-        else if ((EPVal & EP_CTR_RX) != 0)
-        {
-          _ClearEP_CTR_RX(ENDP0);
-          NUSB_EP0_OutProcess();
-        }
-      }
-#endif        
+	        g_SaveRxStatus &=  EPRX_STAT;	    
 			
 			EPVal = _GetENDPOINT(ENDP0);
 			if ((EPVal & EP_CTR_TX) != 0)
@@ -96,6 +61,7 @@ static void _LP_CTR(void)
 				/* clear int flag */
 				_ClearEP_CTR_RX(EPIndex);
 				/* call OUT service function */
+				printf("EP%hu_R:\r\n", EPIndex);
 				(*(g_devOps.Ep_IN)[EPIndex-1])();			
 			}
 			
@@ -104,6 +70,7 @@ static void _LP_CTR(void)
 				/* clear int flag */
 				_ClearEP_CTR_TX(EPIndex);
 				/* call IN service function */
+				printf("EP%hu_T:\r\n", EPIndex);
 				(*(g_devOps.Ep_IN)[EPIndex-1])();
 			}
 		} //else
