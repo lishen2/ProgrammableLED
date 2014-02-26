@@ -198,6 +198,9 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 				&& (request->USBwLengths.w == 0x00))
 			{
 				printf("MS_RESET\r\n");
+				ClearDTOG_TX(ENDP1);
+    			ClearDTOG_RX(ENDP2);
+				SetEPRxStatus(ENDP2, EP_RX_VALID);
 				NUSB_EP0SendData(NULL, 0);
 				resault	= NUSB_SUCCESS;
 			}

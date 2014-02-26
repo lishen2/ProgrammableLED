@@ -33,7 +33,7 @@ static void _LP_CTR(void)
             	NUSB_EP0_InProcess();
 				
 			}
-			if ((EPVal & EP_CTR_RX) != 0)
+			else if ((EPVal & EP_CTR_RX) != 0)
 			{
 				_ClearEP_CTR_RX(ENDP0);             
     		    if ((EPVal & EP_SETUP) != 0)
