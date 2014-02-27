@@ -8,6 +8,7 @@
 #include "nusb_hw.h"
 #include "nusb_desc.h"
 #include "nusb_conf.h"
+#include "nusb_scsi.h"
 
 static u8 g_MaxLun = NUSB_MAX_LUN;
 
@@ -39,7 +40,7 @@ NUSB_DEVICE_OPS g_devOps =
 	_SetConfiguration,
 	_classSetup,
 	{
-	    NOP_Process,   /* EP1_IN_Callback */
+	    NUSB_OnSendFinish,   /* EP1_IN_Callback */
 	    NOP_Process,   /* EP2_IN_Callback */
 	    NOP_Process,   /* EP3_IN_Callback */
 	    NOP_Process,   /* EP4_IN_Callback */
@@ -49,7 +50,7 @@ NUSB_DEVICE_OPS g_devOps =
   	},
 	{
 		NOP_Process,	/* EP1_OUT_Callback */
-		NOP_Process,	/* EP2_OUT_Callback */
+		NUSB_OnReceive,	/* EP2_OUT_Callback */
 		NOP_Process,	/* EP3_OUT_Callback */
 		NOP_Process,	/* EP4_OUT_Callback */
 		NOP_Process,	/* EP5_OUT_Callback */
@@ -166,6 +167,9 @@ static void _SetConfiguration(void)
 {
 	ClearDTOG_TX(ENDP1);
     ClearDTOG_RX(ENDP2);
+	SetEPRxStatus(ENDP2, EP_RX_VALID);
+
+	NUSB_ResetStatus();
 
 	return;
 }
@@ -200,6 +204,7 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 				printf("MS_RESET\r\n");
 				ClearDTOG_TX(ENDP1);
     			ClearDTOG_RX(ENDP2);
+				NUSB_ResetStatus();
 				SetEPRxStatus(ENDP2, EP_RX_VALID);
 				NUSB_EP0SendData(NULL, 0);
 				resault	= NUSB_SUCCESS;

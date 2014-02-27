@@ -1,6 +1,5 @@
 #include "stm32f10x.h"
 #include "nusb_desc.h"
-#include "nusb_hw.h"
 #include "nusb_assert.h"
 
 #define         ID1          (0x1FFFF7E8)
