@@ -15,6 +15,6 @@ extern uint8_t MASS_DeviceDescriptor[MASS_SIZ_DEVICE_DESC];
 extern uint8_t MASS_ConfigDescriptor[MASS_SIZ_CONFIG_DESC];
 extern u8* MASS_StringArray[5];
 
-void NUSB_UpdateSerialNum(void);
+void MASS_UpdateSerialNum(void);
 
 #endif

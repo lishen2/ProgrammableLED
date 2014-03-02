@@ -1,9 +1,9 @@
 #include "stm32f10x.h"
-#include "nusb_hw.h"
+#include "mass_hw.h"
 #include "usb_regs.h"
-#include "nusb_conf.h"
+#include "mass_conf.h"
 
-void NUSB_HwConfig(void)
+void MASS_HwConfig(void)
 {
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;

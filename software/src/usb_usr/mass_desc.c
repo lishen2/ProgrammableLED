@@ -1,5 +1,5 @@
 #include "stm32f10x.h"
-#include "nusb_desc.h"
+#include "mass_desc.h"
 #include "nusb_assert.h"
 
 #define         ID1          (0x1FFFF7E8)
@@ -175,7 +175,7 @@ void _generateSerialNum(char* buf, int len)
 	return;	
 }
 
-void NUSB_UpdateSerialNum(void)
+void MASS_UpdateSerialNum(void)
 {
 	char serialNum[16];
 	int i;

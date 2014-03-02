@@ -3,17 +3,17 @@
 #include "stm32f10x.h"
 #include "usb_regs.h"
 #include "usb_def.h"
-#include "nusb_ops.h"
+#include "mass_ops.h"
 #include "nusb_intf.h"
-#include "nusb_hw.h"
-#include "nusb_desc.h"
-#include "nusb_conf.h"
-#include "nusb_scsi.h"
+#include "mass_hw.h"
+#include "mass_desc.h"
+#include "mass_conf.h"
+#include "mass_state.h"
 
-static u8 g_MaxLun = NUSB_MAX_LUN;
+static u8 g_MaxLun = MASS_MAX_LUN;
 
-#define NUSB_CLASS_GET_MAX_LUN                0xFE
-#define NUSB_CLASS_MASS_STORAGE_RESET         0xFF
+#define MASS_CLASS_GET_MAX_LUN                0xFE
+#define MASS_CLASS_MASS_STORAGE_RESET         0xFF
 
 static void _Init(void);
 static void _Reset(void);
@@ -40,7 +40,7 @@ NUSB_DEVICE_OPS g_devOps =
 	_SetConfiguration,
 	_classSetup,
 	{
-	    NUSB_OnSendFinish,   /* EP1_IN_Callback */
+	    MASS_OnSendFinish,   /* EP1_IN_Callback */
 	    NOP_Process,   /* EP2_IN_Callback */
 	    NOP_Process,   /* EP3_IN_Callback */
 	    NOP_Process,   /* EP4_IN_Callback */
@@ -50,7 +50,7 @@ NUSB_DEVICE_OPS g_devOps =
   	},
 	{
 		NOP_Process,	/* EP1_OUT_Callback */
-		NUSB_OnReceive,	/* EP2_OUT_Callback */
+		MASS_OnReceive,	/* EP2_OUT_Callback */
 		NOP_Process,	/* EP3_OUT_Callback */
 		NOP_Process,	/* EP4_OUT_Callback */
 		NOP_Process,	/* EP5_OUT_Callback */
@@ -61,33 +61,33 @@ NUSB_DEVICE_OPS g_devOps =
 
 NUSB_DEVICE_CONFIGURATION g_devConf = 
 {
-    NUSB_IMR_MSK,
-    NUSB_ENDP0_BUFFER_SIZE,
-	NUSB_TOTAL_CONFIGURATION,
+    MASS_IMR_MSK,
+    MASS_ENDP0_BUFFER_SIZE,
+	MASS_TOTAL_CONFIGURATION,
 	NUSB_DEVICE_FEATURE_NO_FEATURE
 };
 
 static void _Init(void)
 {
 
-	NUSB_UpdateSerialNum();
-	NUSB_HwConfig();
+	MASS_UpdateSerialNum();
+	MASS_HwConfig();
 
 	return;
 }
 
 static void _Reset(void)
 {	
-	SetBTABLE(NUSB_BTABLE_ADDRESS);
+	SetBTABLE(MASS_BTABLE_ADDRESS);
 	
 	/* Initialize Endpoint 0 */
 	SetEPType(ENDP0, EP_CONTROL);
 	Clear_Status_Out(ENDP0);
 	
-	SetEPTxAddr(ENDP0, NUSB_ENDP0_TXADDR);
+	SetEPTxAddr(ENDP0, MASS_ENDP0_TXADDR);
 	SetEPTxCount(ENDP0, 0);
-	SetEPRxAddr(ENDP0, NUSB_ENDP0_RXADDR);
-	SetEPRxCount(ENDP0, NUSB_ENDP0_BUFFER_SIZE);
+	SetEPRxAddr(ENDP0, MASS_ENDP0_RXADDR);
+	SetEPRxCount(ENDP0, MASS_ENDP0_BUFFER_SIZE);
 
 	SetEPTxStatus(ENDP0, EP_TX_NAK);
 	SetEPRxStatus(ENDP0, EP_RX_VALID);
@@ -97,7 +97,7 @@ static void _Reset(void)
 	/* Initialize Endpoint 1 */
 	SetEPType(ENDP1, EP_BULK);
 
-	SetEPTxAddr(ENDP1, NUSB_ENDP1_TXADDR);
+	SetEPTxAddr(ENDP1, MASS_ENDP1_TXADDR);
 	SetEPTxStatus(ENDP1, 0);
 
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
@@ -108,8 +108,8 @@ static void _Reset(void)
 	/* Initialize Endpoint 2 */
 	SetEPType(ENDP2, EP_BULK);
 
-	SetEPRxAddr(ENDP2, NUSB_ENDP2_RXADDR);
-	SetEPRxCount(ENDP2, NUSB_ENDP2_BUFFER_SIZE);
+	SetEPRxAddr(ENDP2, MASS_ENDP2_RXADDR);
+	SetEPRxCount(ENDP2, MASS_ENDP2_BUFFER_SIZE);
     
 	SetEPTxStatus(ENDP2, EP_TX_DIS);
 	SetEPRxStatus(ENDP2, EP_RX_VALID);
@@ -169,7 +169,7 @@ static void _SetConfiguration(void)
     ClearDTOG_RX(ENDP2);
 	SetEPRxStatus(ENDP2, EP_RX_VALID);
 
-	NUSB_ResetStatus();
+	MASS_ResetState();
 
 	return;
 }
@@ -180,7 +180,7 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 
 	switch(request->USBbRequest)
 	{
-		case NUSB_CLASS_GET_MAX_LUN:
+		case MASS_CLASS_GET_MAX_LUN:
 		{
 			if ((INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
 				&& (request->USBwValues.w == 0)
@@ -194,7 +194,7 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 
 			break;
 		}
-		case NUSB_CLASS_MASS_STORAGE_RESET:
+		case MASS_CLASS_MASS_STORAGE_RESET:
 		{
 			if ((INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
 				&& (request->USBwValues.w == 0)
@@ -204,7 +204,7 @@ static NUSB_RESULT _classSetup(NUSB_REQUEST* request)
 				printf("MS_RESET\r\n");
 				ClearDTOG_TX(ENDP1);
     			ClearDTOG_RX(ENDP2);
-				NUSB_ResetStatus();
+				MASS_ResetState();
 				SetEPRxStatus(ENDP2, EP_RX_VALID);
 				NUSB_EP0SendData(NULL, 0);
 				resault	= NUSB_SUCCESS;
