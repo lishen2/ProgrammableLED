@@ -44,11 +44,10 @@ static int _handleCBW(u32 length)
 		case SCSI_REQUEST_SENSE:
 			printf("REQUEST_SENSE\r\n");
 			MASS_CMD_RequestSense(&g_CBW, &g_CSW);
-			//SCSI_RequestSense_Cmd (CBW.bLUN);
 			break;
 		case SCSI_INQUIRY:
 			printf("SCSI_INQUIRY\r\n");
-			//SCSI_Inquiry_Cmd(CBW.bLUN);
+			MASS_CMD_Inquiry_Cmd(&g_CBW, &g_CSW);
 			break;
 		case SCSI_START_STOP_UNIT:
 			printf("START_STOP_UNIT\r\n");
@@ -163,12 +162,26 @@ void MASS_OnSendFinish(void)
 		case MASS_SCSI_SEND_CSW:
 		{
 			printf(" SendCSW\r\n");
+
+			/* waiting for ACK */
+			g_Status = MASS_SCSI_EXPECT_ACK;
+
+			/* send CSW */
 			MASS_SendData(&g_CSW, sizeof(g_CSW));
+			
 			break;
 		}
 		case MASS_SCSI_SEND_DATA:
 		{
 			printf(" ContinueSendData\r\n");
+			break;
+		}
+		case MASS_SCSI_EXPECT_ACK:
+		{
+			printf(" Set EP2 RX VALID.\r\n");
+			/* Send success, wait for next command */
+			g_Status = MASS_SCSI_EXPECT_CBW;
+			SetEPRxStatus(MASS_RECEIVE_ENDPOINT, EP_RX_VALID);
 			break;
 		}
 		default:

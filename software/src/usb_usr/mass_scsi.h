@@ -7,6 +7,7 @@ u8* MASS_GetSenseData(uint8_t lun);
 
 void Mass_CMD_TestUnitReady(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw);
 void MASS_CMD_RequestSense(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw);
+void MASS_CMD_Inquiry_Cmd(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw);
 
 
 #endif

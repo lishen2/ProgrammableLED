@@ -67,14 +67,6 @@
 #define SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT 			               0x3A
 #define SCSI_SENSE_ASC_MEDIUM_HAVE_CHANGED			               0x28
 
-#define SCSI_SENSE_ASC_READ_FORMAT_CAPACITY_DATA_LEN               0x0C
-#define SCSI_SENSE_ASC_READ_CAPACITY10_DATA_LEN                    0x08
-#define SCSI_SENSE_ASC_MODE_SENSE10_DATA_LEN                       0x08
-#define SCSI_SENSE_ASC_MODE_SENSE6_DATA_LEN                        0x04
-#define SCSI_SENSE_ASC_REQUEST_SENSE_DATA_LEN                      0x12
-#define SCSI_SENSE_ASC_STANDARD_INQUIRY_DATA_LEN                   0x24
-#define SCSI_SENSE_ASC_BLKVFY                                      0x04
-
 /********************************************************************/
 /* END OF SCSI SENSE CODE	*/
 /********************************************************************/

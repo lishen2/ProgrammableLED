@@ -62,7 +62,7 @@ static void _LP_CTR(void)
 				_ClearEP_CTR_RX(EPIndex);
 				/* call OUT service function */
 				printf("EP%hu_R:\r\n", EPIndex);
-				(*(g_devOps.Ep_IN)[EPIndex-1])();			
+				(*(g_devOps.Ep_OUT)[EPIndex-1])();			
 			}
 			
 			if ((EPVal & EP_CTR_TX) != 0)

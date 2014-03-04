@@ -27,7 +27,7 @@
 
 
 /* define ENDP1 as receive end point, ENDP2 as send end point */
-#define MASS_SEND_ENDPOINT   ENDP1
+#define MASS_SEND_ENDPOINT    ENDP1
 #define MASS_RECEIVE_ENDPOINT ENDP2   
 
 

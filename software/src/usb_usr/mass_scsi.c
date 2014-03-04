@@ -60,6 +60,8 @@ void Mass_CMD_TestUnitReady(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
 		MASS_SetSenseData(cbw->bLUN, SCSI_SENSE_KEY_NOT_READY, SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT);	
 	}
 
+	MASS_SetState(MASS_SCSI_EXPECT_ACK);
+
 	printf(" SendCSW\r\n");
 	MASS_SendData(csw, sizeof(MASS_Bulk_Only_CSW));
 
@@ -79,11 +81,72 @@ void MASS_CMD_RequestSense(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
 		DataLength = sizeof(g_Scsi_Sense_Data);
 	}
 
+	/* Send CSW when successfully send sense data */
+	csw->bStatus = SCSI_CSW_PASSED;
+	MASS_SetState(MASS_SCSI_SEND_CSW);
+
 	printf(" SendSense\r\n");
 	MASS_SendData(&g_Scsi_Sense_Data, DataLength);
-
-	/* Send CSW when successfully send sense data */
-	MASS_SetState(MASS_SCSI_SEND_CSW);
 	
 	return;	
+}
+
+static uint8_t g_Page00_Inquiry_Data[] =
+{
+	0x00, /* PERIPHERAL QUALIFIER & PERIPHERAL DEVICE TYPE*/
+	0x00,
+	0x00,
+	0x00,
+	0x00 /* Supported Pages 00*/
+};
+
+static uint8_t g_Standard_Inquiry_Data[] =
+  {
+    0x00,          /* Direct Access Device */
+    0x80,          /* RMB = 1: Removable Medium */
+    0x02,          /* Version: No conformance claim to standard */
+    0x02,
+
+    36 - 4,          /* Additional Length */
+    0x00,          /* SCCS = 1: Storage Controller Component */
+    0x00,
+    0x00,
+    /* Vendor Identification */
+    'S', 'T', 'M', ' ', ' ', ' ', ' ', ' ',
+    /* Product Identification */
+    'N', 'A', 'N', 'D', ' ', 'F', 'l', 'a', 's', 'h', ' ',
+    'D', 'i', 's', 'k', ' ',
+    /* Product Revision Level */
+    '1', '.', '0', ' '
+  };
+
+void MASS_CMD_Inquiry_Cmd(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
+{
+	uint8_t* Inquiry_Data;
+	uint16_t Inquiry_Data_Length;
+	
+	if (cbw->CB[1] & 0x01)/*Evpd is set*/
+	{
+		Inquiry_Data = g_Page00_Inquiry_Data;
+		Inquiry_Data_Length = sizeof(g_Page00_Inquiry_Data);
+	}
+	else
+	{
+		Inquiry_Data = g_Standard_Inquiry_Data;
+
+		if (cbw->CB[4] < sizeof(g_Standard_Inquiry_Data))
+			Inquiry_Data_Length = cbw->CB[4];
+		else
+			Inquiry_Data_Length = sizeof(g_Standard_Inquiry_Data);
+	}
+
+	/* Send CSW when successfully send data */
+	csw->bStatus = SCSI_CSW_PASSED;
+	csw->dDataResidue = cbw->dDataLength - Inquiry_Data_Length;
+	MASS_SetState(MASS_SCSI_SEND_CSW);
+
+	printf(" SendInquiry\r\n");
+	MASS_SendData(Inquiry_Data, Inquiry_Data_Length);
+
+	return;
 }
