@@ -104,8 +104,8 @@ static uint8_t g_Standard_Inquiry_Data[] =
   {
     0x00,          /* Direct Access Device */
     0x80,          /* RMB = 1: Removable Medium */
-    0x02,          /* Version: No conformance claim to standard */
-    0x02,
+    0x00,          /* Version: No conformance claim to standard */
+    0x01,
 
     36 - 4,          /* Additional Length */
     0x00,          /* SCCS = 1: Storage Controller Component */
@@ -139,6 +139,8 @@ void MASS_CMD_Inquiry_Cmd(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
 		else
 			Inquiry_Data_Length = sizeof(g_Standard_Inquiry_Data);
 	}
+
+    Inquiry_Data_Length = 0;
 
 	/* Send CSW when successfully send data */
 	csw->bStatus = SCSI_CSW_PASSED;

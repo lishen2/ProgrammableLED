@@ -98,8 +98,7 @@ static void _Reset(void)
 	SetEPType(ENDP1, EP_BULK);
 
 	SetEPTxAddr(ENDP1, MASS_ENDP1_TXADDR);
-	SetEPTxStatus(ENDP1, 0);
-
+	SetEPTxCount(ENDP1, 0);
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 
@@ -110,9 +109,8 @@ static void _Reset(void)
 
 	SetEPRxAddr(ENDP2, MASS_ENDP2_RXADDR);
 	SetEPRxCount(ENDP2, MASS_ENDP2_BUFFER_SIZE);
-    
-	SetEPTxStatus(ENDP2, EP_TX_DIS);
 	SetEPRxStatus(ENDP2, EP_RX_VALID);
+	SetEPTxStatus(ENDP2, EP_TX_DIS);
 
 	_SetEPAddress(ENDP2, ENDP2);
 

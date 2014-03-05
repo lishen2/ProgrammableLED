@@ -14,6 +14,8 @@ static MASS_Bulk_Only_CSW g_CSW;
 
 static void _goToErrorStatus(void)
 {
+    printf("Into error status.\r\n");
+
 	g_Status = MASS_SCSI_ERROR;
 
 	SetEPTxStatus(MASS_SEND_ENDPOINT,    EP_TX_STALL);
@@ -120,7 +122,7 @@ static int _handleCBW(u32 length)
 /* called when host send command or data out */
 void MASS_OnReceive(void)
 {
-	int ret;
+	int ret = NUSB_ERROR;
 	u32 receivedLength;
 
 	// read received data
@@ -166,9 +168,12 @@ void MASS_OnSendFinish(void)
 			/* waiting for ACK */
 			g_Status = MASS_SCSI_EXPECT_ACK;
 
+            /* TODO */
+            SetEPRxStatus(MASS_RECEIVE_ENDPOINT, EP_RX_VALID); 
+
 			/* send CSW */
-			MASS_SendData(&g_CSW, sizeof(g_CSW));
-			
+			MASS_SendData(&g_CSW, sizeof(g_CSW));      
+           
 			break;
 		}
 		case MASS_SCSI_SEND_DATA:

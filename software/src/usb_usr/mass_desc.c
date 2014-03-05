@@ -13,8 +13,8 @@ uint8_t MASS_StringSerial[MASS_SIZ_STRING_SERIAL] =
     MASS_SIZ_STRING_SERIAL,
     0x03,
     /* Serial number*/
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    '2', 0, '4', 0, '6', 0, '0', 0, '0', 0, '0', 0, '0', 0, '9', 0,
+	'0', 0, '9', 0, '0', 0, '7', 0, '9', 0, '0', 0, '0', 0, '9', 0
 };
 
 uint8_t MASS_DeviceDescriptor[MASS_SIZ_DEVICE_DESC] =

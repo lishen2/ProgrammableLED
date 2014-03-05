@@ -41,6 +41,10 @@
 #define MASS_MAX_LUN                 0 /* zero means one logic unit */
 
 
+#define MASS_PULLUP_PIN             GPIO_Pin_10        
+#define MASS_PULLUP_GPIO            GPIOA
+#define MASS_PULLUP_GPIO_CLK        RCC_APB2Periph_GPIOA
+
 #endif /* __USB_CONF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
