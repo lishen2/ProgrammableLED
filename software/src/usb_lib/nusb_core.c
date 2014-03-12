@@ -115,55 +115,7 @@ static void _parserSetupMsg(NUSB_REQUEST* request)
     return;
 }
 
-static NUSB_RESULT _req_getStatus(NUSB_REQUEST* request)
-{
-    NUSB_RESULT resault = NUSB_SUCCESS;
-	u16 feature;
-	u8 EPNum;
-
-   /* GET STATUS for Device*/
-    if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT)
-        && (request->USBwIndex == 0))
-    {
-		feature = g_devConf.DeviceFeature;
-    }
-    /* GET STATUS for Interface*/
-    else if (INTERFACE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
-    {
-		feature = 0;	
-    }
-    /* GET STATUS for EndPoint*/
-    else if (ENDPOINT_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
-    {
-		EPNum = request->USBwIndex0 & 0x0f;
-		
-		feature = 0;
-		if (0 != request->USBwIndex0 & 0x80)
-		{
-			if (_GetTxStallStatus(EPNum)){
-				feature = 0x01;	
-			}
-		}
-		else
-		{
-			if (_GetRxStallStatus(EPNum)){
-				feature = 0x01;	
-			}
-		}
-	
-    } else {
-		resault = NUSB_ERROR;
-	}
-
-	if (NUSB_SUCCESS == resault)
-	{
-		NUSB_EP0SendData((u8*)&feature, sizeof(feature));
-	}
-	
-	return resault;	
-}
-
-static NUSB_RESULT _req_getDescripter(NUSB_REQUEST* request)
+static NUSB_RESULT _req_devGetDescripter(NUSB_REQUEST* request)
 {
     NUSB_RESULT resault;
     u32 length;
@@ -212,7 +164,7 @@ static NUSB_RESULT _req_getDescripter(NUSB_REQUEST* request)
     return resault;
 }
 
-static NUSB_RESULT _req_setAddress(NUSB_REQUEST* request)
+static NUSB_RESULT _req_devSetAddress(NUSB_REQUEST* request)
 {
 	NUSB_RESULT resault;
 
@@ -235,7 +187,7 @@ static NUSB_RESULT _req_setAddress(NUSB_REQUEST* request)
     return resault;
 }
 
-static NUSB_RESULT _req_setConfiguration(NUSB_REQUEST* request)
+static NUSB_RESULT _req_devSetConfiguration(NUSB_REQUEST* request)
 {
 	if ((request->USBwValue0 <= g_devConf.TotalConfiguration) 
 		&& (request->USBwValue1 == 0)
@@ -254,44 +206,154 @@ static NUSB_RESULT _req_setConfiguration(NUSB_REQUEST* request)
 	}
 }
 
-static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
+static NUSB_RESULT _req_devGetStatus(NUSB_REQUEST* request)
 {
-    NUSB_RESULT resault = NUSB_ERROR;
-    
+	NUSB_EP0SendData((u8*)&(g_devConf.DeviceFeature), sizeof(g_devConf.DeviceFeature));	
+	return NUSB_SUCCESS;	
+}
+
+static NUSB_RESULT _req_devClearFeature(NUSB_REQUEST* request)
+{
+	if (0 != (request->USBwValue0 & DEVICE_REMOTE_WAKEUP))
+	{
+		g_devConf.DeviceFeature &= ~DEVICE_REMOTE_WAKEUP;
+	}
+
+	NUSB_EP0SendData(NULL, 0);
+
+	return NUSB_SUCCESS;
+}
+
+static NUSB_RESULT _req_devSetFeature(NUSB_REQUEST* request)
+{
+	if (0 != (request->USBwValue0 & DEVICE_REMOTE_WAKEUP))
+	{
+		g_devConf.DeviceFeature &= DEVICE_REMOTE_WAKEUP;
+	}
+
+	NUSB_EP0SendData(NULL, 0);
+
+	return NUSB_SUCCESS;
+}
+
+static NUSB_RESULT _req_intfGetStatus(NUSB_REQUEST* request)
+{
+	u16 feature = 0;
+	NUSB_EP0SendData((u8*)&feature, sizeof(feature));
+	return NUSB_SUCCESS;	
+}
+
+static NUSB_RESULT _req_EPGetStatus(NUSB_REQUEST* request)
+{
+	u16 feature;
+	u8 EPNum;
+
+	EPNum = request->USBwIndex0 & 0x0f;	
+	feature = 0;
+
+	/* Determin Tx or Rx */
+	if (0 != request->USBwIndex0 & 0x80)
+	{
+		if (_GetTxStallStatus(EPNum)){
+			feature = 0x01;	
+		}
+	}
+	else
+	{
+		if (_GetRxStallStatus(EPNum)){
+			feature = 0x01;	
+		}
+	}
+	
+	NUSB_EP0SendData((u8*)&feature, sizeof(feature));
+	
+	return NUSB_SUCCESS;	
+}
+
+static NUSB_RESULT _req_EPClearFeature(NUSB_REQUEST* request)
+{
+	u8 EPNum;
+	u8 Direction;
+
+	EPNum = request->USBwIndex0 & 0x0F;
+	Direction = request->USBwIndex0 & 0x80;
+
+    if ((request->USBwValue != ENDPOINT_STALL)
+        || (EPNum == 0))
+    {
+		return NUSB_UNSUPPORT;
+    }
+
+    if (0 == Direction)
+    {
+		/* OUT endpoint */
+		if (_GetRxStallStatus(EPNum))
+		{
+			ClearDTOG_RX(EPNum);
+			_SetEPRxStatus(EPNum, EP_RX_VALID);
+		}
+    }
+    else
+    {
+		/* IN endpoint */
+		if (_GetTxStallStatus(EPNum))
+		{
+			ClearDTOG_TX(EPNum);
+			SetEPTxStatus(EPNum, EP_TX_VALID);
+		}
+    }
+
+	NUSB_EP0SendData(NULL, 0);
+	
+	return NUSB_SUCCESS;	
+}
+
+static NUSB_RESULT _req_EPSetFeature(NUSB_REQUEST* request)
+{
+	u8 EPNum;
+
+	EPNum = request->USBwIndex0 & 0x0f;	
+
+
+	NUSB_EP0SendData(NULL, 0);
+	
+	return NUSB_SUCCESS;	
+}
+
+static NUSB_RESULT _standReqDevice(NUSB_REQUEST* request)
+{
+	NUSB_RESULT resault = NUSB_ERROR;
+
     switch (request->USBbRequest)
     {
         case GET_STATUS:
         {
 			printf("GET_STATUS\r\n");
-			resault = _req_getStatus(request);
+			resault = _req_devGetStatus(request);
             break;
         }
         case CLEAR_FEATURE:
         {
 			printf("CLEAR_FEATURE\r\n");
+			resault = _req_devClearFeature(request);
             break;
         }
         case SET_FEATURE:
         {
 			printf("SET_FEATURE\r\n");
+			resault = _req_devSetFeature(request);
             break;
         }
         case SET_ADDRESS:
         {
 			printf("SET_ADDRESS-");
-            if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
-            {
-                resault = _req_setAddress(request);    
-            }            
+            resault = _req_devSetAddress(request);               
             break;
         }
         case GET_DESCRIPTOR:
         {
 			printf("GET_DESC-");
-            if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
-            {
-                resault = _req_getDescripter(request);    
-            }
+            resault = _req_devGetDescripter(request);    
             break;
         }
         case SET_DESCRIPTOR:
@@ -307,12 +369,47 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         case SET_CONFIGURATION:
         {
 			printf("SET_CONF\r\n");
-			if (DEVICE_RECIPIENT == (request->USBbmRequestType & RECIPIENT))
-            {
-                resault = _req_setConfiguration(request);    
-            }
+            resault = _req_devSetConfiguration(request);    
             break;
-        }            
+        }                   
+        default:
+        {
+			printf("UN_REQ\r\n");
+            resault = NUSB_UNSUPPORT;
+            break;
+        }        
+    } //switch
+
+
+  	return resault;
+}
+
+static NUSB_RESULT _standReqInterface(NUSB_REQUEST* request)
+{
+	NUSB_RESULT resault = NUSB_ERROR;
+	
+	switch (request->USBbRequest)
+    {
+        case GET_STATUS:
+        {
+			printf("GET_STATUS\r\n");
+			resault = _req_intfGetStatus(request);
+            break;
+        }
+        case CLEAR_FEATURE:
+        {
+			printf("CLEAR_FEATURE\r\n");
+			NUSB_EP0SendData(NULL, 0);
+			resault = NUSB_SUCCESS;
+            break;
+        }
+        case SET_FEATURE:
+        {
+			printf("SET_FEATURE\r\n");
+			NUSB_EP0SendData(NULL, 0);
+			resault = NUSB_SUCCESS;
+            break;
+        }          
         case GET_INTERFACE:
         {
 			printf("GET_INTF\r\n");
@@ -331,7 +428,84 @@ static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
         }        
     } //switch
 
-    return resault;
+
+	return resault;
+}
+
+static NUSB_RESULT _standReqEndpoint(NUSB_REQUEST* request)
+{
+	NUSB_RESULT resault = NUSB_ERROR;
+
+    switch (request->USBbRequest)
+    {
+        case GET_STATUS:
+        {
+			printf("GET_STATUS\r\n");
+			resault = _req_EPGetStatus(request);
+            break;
+        }
+        case CLEAR_FEATURE:
+        {
+			printf("CLEAR_FEATURE\r\n");
+			resault = _req_EPClearFeature(request);
+            break;
+        }
+        case SET_FEATURE:
+        {
+			printf("SET_FEATURE\r\n");
+			resault = _req_EPSetFeature(request);
+            break;
+        }
+		case SYNCH_FRAME:
+		{
+		 	printf("SYNCH_FRAME\r\n");
+			break;
+		}   
+        default:
+        {
+			printf("UN_REQ\r\n");
+            resault = NUSB_UNSUPPORT;
+            break;
+        }        
+    } //switch
+
+	return resault;
+}
+
+static NUSB_RESULT _standardRequest(NUSB_REQUEST* request)
+{
+	NUSB_RESULT resault = NUSB_ERROR;
+	u8 recipent = (request->USBbmRequestType & RECIPIENT);
+	
+	switch(recipent)
+	{
+		case DEVICE_RECIPIENT:
+		{
+			printf("D-");
+			resault = _standReqDevice(request);
+			break;
+		}
+		case INTERFACE_RECIPIENT:
+		{
+			printf("I-");
+			resault = _standReqInterface(request);
+			break;
+		}
+		case ENDPOINT_RECIPIENT:
+		{
+			printf("E-");
+			resault = _standReqEndpoint(request);
+			break;
+		}
+		default:
+		{
+			printf("UNKNOWN recipient\r\n");
+            resault = NUSB_UNSUPPORT;
+			break;
+		}
+	}
+	
+	return resault;
 }
 
 void NUSB_EP0_SetupProcess(void)

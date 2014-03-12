@@ -33,7 +33,7 @@
 
 /* ISTR events */
 /* mask defining which events has to be handled by the device application software */
-#define MASS_IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_RESETM )
+#define MASS_IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_RESETM | CNTR_SOFM | CNTR_ESOFM)
 
 /* The number of configurations */
 #define MASS_TOTAL_CONFIGURATION     1

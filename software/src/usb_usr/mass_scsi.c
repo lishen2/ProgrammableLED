@@ -124,6 +124,7 @@ void MASS_CMD_Inquiry_Cmd(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
 {
 	uint8_t* Inquiry_Data;
 	uint16_t Inquiry_Data_Length;
+	u16 wEPVal1, wEPVal2;
 	
 	if (cbw->CB[1] & 0x01)/*Evpd is set*/
 	{
@@ -140,15 +141,21 @@ void MASS_CMD_Inquiry_Cmd(MASS_Bulk_Only_CBW *cbw, MASS_Bulk_Only_CSW *csw)
 			Inquiry_Data_Length = sizeof(g_Standard_Inquiry_Data);
 	}
 
-    Inquiry_Data_Length = 0;
-
 	/* Send CSW when successfully send data */
 	csw->bStatus = SCSI_CSW_PASSED;
 	csw->dDataResidue = cbw->dDataLength - Inquiry_Data_Length;
 	MASS_SetState(MASS_SCSI_SEND_CSW);
 
-	printf(" SendInquiry\r\n");
+	//printf(" SendInquiry\r\n");
+	wEPVal1 = _GetENDPOINT(ENDP1);
+	wEPVal2	= _GetENDPOINT(ENDP2);
+	printf("Before EP1:%hx EP2:%hx\r\n", wEPVal1, wEPVal2);	
+
 	MASS_SendData(Inquiry_Data, Inquiry_Data_Length);
+
+  	wEPVal1 = _GetENDPOINT(ENDP1);
+	wEPVal2	= _GetENDPOINT(ENDP2);
+	printf("After EP1:%hx EP2:%hx\r\n", wEPVal1, wEPVal2);	
 
 	return;
 }

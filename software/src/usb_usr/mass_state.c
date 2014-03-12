@@ -143,6 +143,7 @@ void MASS_OnReceive(void)
 		}
 		default:
 		{
+			printf(" UNSUPPORT\r\n");
 			_goToErrorStatus();
 			break;
 		}
@@ -191,6 +192,7 @@ void MASS_OnSendFinish(void)
 		}
 		default:
 		{
+			printf(" UNSUPPORT\r\n");
 			break;
 		}
 	}

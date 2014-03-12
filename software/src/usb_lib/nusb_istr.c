@@ -115,7 +115,14 @@ void NUSB_LP_INT(void)
 		_SetISTR((uint16_t)CLR_SUSP); 
         printf("SUSPEND\r\n");
 	}
-
+  if (wIstr & ISTR_SOF)
+  {
+    _SetISTR((uint16_t)CLR_SOF);
+  }
+  if (wIstr & ISTR_ESOF)
+  {
+    _SetISTR((uint16_t)CLR_ESOF);
+  }
 	return;
 }
 
