@@ -19,8 +19,10 @@ int main()
 	NUSB_init();
 	ACC_Init();
 
+
 	printf("Init finished.\r\n");
 
+/*
 	curZ = lastZ = 0;
 	while(1){
 		curZ = ACC_ReadZ();
@@ -29,28 +31,23 @@ int main()
 		}
 		lastZ = curZ;
 		
-		delay_ms(100); 
+		delay_10ms(100); 
 	}
+*/
+  	LED_Init();
+    LED_SetColor(0x0111, 0x0111);
+    delay_10ms(200);
 
-/*
-	LED_Init();
-	LED_LightupAll();
-	delay_ms(70);
-	LED_ShutdownAll();
-	delay_ms(50);
-
-   	led = LED1_RED;
 	while(1){
-		LED_LightControl(led, LED_LIGHTUP);
-		delay_ms(5);
-		LED_LightControl(led, LED_SHUTDOWN);
-		delay_ms(5);
-		
-		led++;
-		if (led > LED2_BLUE){
-			led = LED1_RED;
-		}	
-	} */
+        LED_SetColor(0x0500, 0x0050);    
+        delay_10ms(50);
+        LED_SetColor(0x0050, 0x0005);    
+        delay_10ms(50);
+        LED_SetColor(0x0005, 0x0500);    
+        delay_10ms(50);     
+	} 
+
+    return 0;
 }
 
 #ifdef __GNUC__

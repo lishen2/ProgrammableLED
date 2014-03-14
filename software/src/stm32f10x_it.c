@@ -27,6 +27,7 @@
 #include "usart_io.h"
 #include "utils.h"
 #include "nusb_intf.h"
+#include "led.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
@@ -139,6 +140,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	++g_jiffies;
+    LED_Interrupt();
 }
 
 /******************************************************************************/

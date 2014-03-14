@@ -8,16 +8,16 @@ void HW_CommonInit(void)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
-    /* 设置中断为全部不可抢占 */  
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+    /* 设置2bit可抢占，2bit不可抢占 */  
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	return;
 }
 
 //初始化systick
 void HW_InitSysTick(void)
 {
-    /* Setup SysTick Timer for 1 msec interrupts  */
-    if (SysTick_Config(SystemCoreClock / 1000)) //SysTick配置函数
+    /* Setup SysTick Timer for 10 msec interrupts  */
+    if (SysTick_Config(80000)) 
     { 
         /* Capture error */ 
         while (1);
@@ -29,7 +29,7 @@ void HW_InitSysTick(void)
 }
 
 /* 毫秒级延时 */
-void delay_ms(int n)
+void delay_10ms(int n)
 {
 	n += g_jiffies;
 
