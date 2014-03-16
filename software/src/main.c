@@ -5,18 +5,15 @@
 #include "utils.h"
 #include "ringbuf.h"
 #include "usart_io.h"
-#include "nusb_intf.h"
 #include "led.h"
 #include "acc_sensor.h"
+#include "display_state.h"
+#include "button.h"
 
 int main()
 {
-//	int led;
-	u16 curZ, lastZ;
-
 	HW_InitSysTick();
-	USARTIO_InitUSART1();
-	NUSB_init();
+	USARTIO_InitUSART1();;
 	ACC_Init();
 
 
@@ -34,18 +31,16 @@ int main()
 		delay_10ms(100); 
 	}
 */
+	BTN_Init();
   	LED_Init();
-    LED_SetColor(0x0111, 0x0111);
-    delay_10ms(200);
+
+	LED_SetColor(0x0555, 0x0555);
+	delay_ms(500);
+	LED_SetColor(0, 0);
 
 	while(1){
-        LED_SetColor(0x0500, 0x0050);    
-        delay_10ms(50);
-        LED_SetColor(0x0050, 0x0005);    
-        delay_10ms(50);
-        LED_SetColor(0x0005, 0x0500);    
-        delay_10ms(50);     
-	} 
+		STATE_Poll();
+	}
 
     return 0;
 }

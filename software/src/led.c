@@ -1,5 +1,6 @@
 #include "stm32f10x.h"
 #include "led.h"
+#include "utils.h"
 
 #define LED_1_PORT  GPIOB
 #define LED_1_RCC   RCC_APB2Periph_GPIOB
@@ -30,7 +31,7 @@
 
 #define LED_GET_RED(color)    ((color & LED_RED_MASK) >> 0)
 #define LED_GET_GREEN(color)  ((color & LED_GREEN_MASK) >> 4)
-#define LED_GET_BLUE(color)   ((color & LED_RED_MASK) >> 8)
+#define LED_GET_BLUE(color)   ((color & LED_BLUE_MASK) >> 8)
 
 /* store led1 color */
 static vu16 g_LED1;
@@ -95,6 +96,13 @@ void LED_Interrupt(void)
     }
 
     return;
+}
+
+void LED_SetColor(u32 led1, u32 led2)
+{
+	g_LED1 = led1;
+	g_LED2 = led2;
+	return;
 }
 
 

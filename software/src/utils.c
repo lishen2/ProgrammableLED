@@ -16,8 +16,8 @@ void HW_CommonInit(void)
 //初始化systick
 void HW_InitSysTick(void)
 {
-    /* Setup SysTick Timer for 10 msec interrupts  */
-    if (SysTick_Config(80000)) 
+    /* Setup SysTick Timer for 1 msec interrupts  */
+    if (SysTick_Config(8000)) 
     { 
         /* Capture error */ 
         while (1);
@@ -29,7 +29,7 @@ void HW_InitSysTick(void)
 }
 
 /* 毫秒级延时 */
-void delay_10ms(int n)
+void delay_ms(int n)
 {
 	n += g_jiffies;
 

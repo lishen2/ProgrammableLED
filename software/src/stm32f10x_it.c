@@ -26,7 +26,6 @@
 #include "ringbuf.h"
 #include "usart_io.h"
 #include "utils.h"
-#include "nusb_intf.h"
 #include "led.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
@@ -170,14 +169,14 @@ void USB_HP_CAN1_TX_IRQHandler(void)
 *******************************************************************************/
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-	NUSB_LP_INT();
+//	NUSB_LP_INT();
 }
-
+/*
 void USBWakeUp_IRQHandler(void)
 {
   EXTI_ClearITPendingBit(EXTI_Line18);
 }
-
+*/
 
 /**
   * @brief  This function handles USART2 global interrupt request.
