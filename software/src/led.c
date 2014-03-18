@@ -26,16 +26,22 @@
 #define LED_GREEN_MASK        0x00F0
 #define LED_BLUE_MASK         0x0F00
 
+#define LED_BITS_PRECOLOR     4
+
 /* jiffies mask */
 #define LED_JIFFIES_MASK      LED_RED_MASK
 
 #define LED_GET_RED(color)    ((color & LED_RED_MASK) >> 0)
-#define LED_GET_GREEN(color)  ((color & LED_GREEN_MASK) >> 4)
-#define LED_GET_BLUE(color)   ((color & LED_BLUE_MASK) >> 8)
+#define LED_GET_GREEN(color)  ((color & LED_GREEN_MASK) >> LED_BITS_PRECOLOR)
+#define LED_GET_BLUE(color)   ((color & LED_BLUE_MASK) >> 2*LED_BITS_PRECOLOR)
 
-/* store led1 color */
-static vu16 g_LED1;
-static vu16 g_LED2;
+/* store led color */
+static u8 g_LED1_R;
+static u8 g_LED1_G;
+static u8 g_LED1_B;
+static u8 g_LED2_R;
+static u8 g_LED2_G;
+static u8 g_LED2_B;
 
 void LED_Init(void)
 {
@@ -67,15 +73,15 @@ void LED_Interrupt(void)
     LED_LIGHTSHUT(LED_1_PORT, LED_1_ALL);
 
     /* light up the color */
-    if (LED_GET_RED(g_LED1) > counter){
+    if (g_LED1_R > counter){
         LED_LIGHTUP(LED_1_PORT, LED_1_RED);
     } 
 
-    if (LED_GET_GREEN(g_LED1) > counter){
+    if (g_LED1_G > counter){
         LED_LIGHTUP(LED_1_PORT, LED_1_GREEN);
     }
 
-    if (LED_GET_BLUE(g_LED1) > counter){
+    if (g_LED1_B > counter){
         LED_LIGHTUP(LED_1_PORT, LED_1_BLUE);
     }
 
@@ -83,25 +89,29 @@ void LED_Interrupt(void)
     LED_LIGHTSHUT(LED_2_PORT, LED_2_ALL);
 
     /* light up the color */
-    if (LED_GET_RED(g_LED2) > counter){
+    if (g_LED2_R > counter){
         LED_LIGHTUP(LED_2_PORT, LED_2_RED);
     } 
 
-    if (LED_GET_GREEN(g_LED2) > counter){
+    if (g_LED2_G > counter){
         LED_LIGHTUP(LED_2_PORT, LED_2_GREEN);
     }
 
-    if (LED_GET_BLUE(g_LED2) > counter){
+    if (g_LED2_B > counter){
         LED_LIGHTUP(LED_2_PORT, LED_2_BLUE);
     }
 
     return;
 }
 
-void LED_SetColor(u32 led1, u32 led2)
+void LED_SetColor(u16 led1, u16 led2)
 {
-	g_LED1 = led1;
-	g_LED2 = led2;
+	g_LED1_R = LED_GET_RED(led1); 
+	g_LED1_G = LED_GET_GREEN(led1); 
+	g_LED1_B = LED_GET_BLUE(led1); 
+	g_LED2_R = LED_GET_RED(led2); 
+	g_LED2_G = LED_GET_GREEN(led2); 
+	g_LED2_B = LED_GET_BLUE(led2); 
 	return;
 }
 

@@ -58,7 +58,7 @@ static void _state_init(void)
 static void _state_gradienter(void)
 {
 	LED_SetColor(0x0111, 0x0111);
-	delay_ms(10);	
+	delay_ms(50);	
 
 	return;	
 }
@@ -74,7 +74,7 @@ static void _state_bicycle(void)
 		counter = 0;
 	}
 
-	delay_ms(10);	
+	delay_ms(50);	
 	LED_SetColor(0x0000, 0x0000);
 
 	return;	
@@ -112,14 +112,14 @@ static void _state_police(void)
 static void _state_sos(void)
 {
 	LED_SetColor(0x0001, 0x0000);
-	delay_ms(10);	
+	delay_ms(50);	
 
 	return;	
 }
 static void _state_freefall(void)
 {
 	LED_SetColor(0x0000, 0x0100);
-	delay_ms(10);	
+	delay_ms(50);	
 
 	return;	
 }

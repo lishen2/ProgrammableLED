@@ -16,7 +16,6 @@ int main()
 	USARTIO_InitUSART1();;
 	ACC_Init();
 
-
 	printf("Init finished.\r\n");
 
 /*
