@@ -21,19 +21,37 @@
 #define LED_LIGHTUP(port, pin)   (port->BRR = pin)
 #define LED_LIGHTSHUT(port, pin) (port->BSRR = pin)
 
+#define LED_3_PORT  GOIOB
+#define LED_3_RCC   RCC_APB2Periph_GPIOB
+#define LED_3_PIN  
+
+#define LED_4_PORT  GOIOB
+#define LED_4_RCC   RCC_APB2Periph_GPIOB
+#define LED_4_PIN  
+
 /* color 4 bits pre color, and we use the 4 LSB to represent red */
-#define LED_RED_MASK          0x000F
-#define LED_GREEN_MASK        0x00F0
-#define LED_BLUE_MASK         0x0F00
+#define LED1_RED_MASK          0x0000000F
+#define LED1_GREEN_MASK        0x000000F0
+#define LED1_BLUE_MASK         0x00000F00
+#define LED2_RED_MASK          0x0000F000
+#define LED2_GREEN_MASK        0x000F0000
+#define LED2_BLUE_MASK         0x00F00000
+#define LED3_MASK              0x0F000000
+#define LED4_MASK			   0xF0000000
 
 #define LED_BITS_PRECOLOR     4
 
 /* jiffies mask */
-#define LED_JIFFIES_MASK      LED_RED_MASK
+#define LED_JIFFIES_MASK      LED1_RED_MASK
 
-#define LED_GET_RED(color)    ((color & LED_RED_MASK) >> 0)
-#define LED_GET_GREEN(color)  ((color & LED_GREEN_MASK) >> LED_BITS_PRECOLOR)
-#define LED_GET_BLUE(color)   ((color & LED_BLUE_MASK) >> 2*LED_BITS_PRECOLOR)
+#define LED1_GET_RED(color)    ((color & LED1_RED_MASK)   >> 0*LED_BITS_PRECOLOR)
+#define LED1_GET_GREEN(color)  ((color & LED1_GREEN_MASK) >> 1*LED_BITS_PRECOLOR)
+#define LED1_GET_BLUE(color)   ((color & LED1_BLUE_MASK)  >> 2*LED_BITS_PRECOLOR)
+#define LED2_GET_RED(color)    ((color & LED2_RED_MASK)   >> 3*LED_BITS_PRECOLOR)
+#define LED2_GET_GREEN(color)  ((color & LED2_GREEN_MASK) >> 4*LED_BITS_PRECOLOR)
+#define LED2_GET_BLUE(color)   ((color & LED2_BLUE_MASK)  >> 5*LED_BITS_PRECOLOR)
+#define LED3_GET_COLOR(color)  ((color & LED3_MASK)       >> 6*LED_BITS_PRECOLOR)
+#define LED4_GET_COLOR(color)  ((color & LED4_MASK)       >> 7*LED_BITS_PRECOLOR)
 
 /* store led color */
 static u8 g_LED1_R;
@@ -42,12 +60,14 @@ static u8 g_LED1_B;
 static u8 g_LED2_R;
 static u8 g_LED2_G;
 static u8 g_LED2_B;
+static u8 g_LED3;
+static u8 g_LED4;
 
 void LED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure; 
 
-	RCC_APB2PeriphClockCmd(LED_1_RCC | LED_2_RCC, ENABLE);
+	RCC_APB2PeriphClockCmd(LED_1_RCC | LED_2_RCC | LED_3_RCC | LED_4_RCC, ENABLE);
 
 	GPIO_InitStructure.GPIO_Pin = LED_1_ALL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -59,8 +79,22 @@ void LED_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(LED_2_PORT, &GPIO_InitStructure);
 
+/*  TODO
+	GPIO_InitStructure.GPIO_Pin = LED_3_PIN;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+	GPIO_Init(LED_3_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = LED_4_PIN;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+	GPIO_Init(LED_4_PORT, &GPIO_InitStructure);
+*/
+
 	GPIO_SetBits(LED_1_PORT, LED_1_ALL);	
-	GPIO_SetBits(LED_2_PORT, LED_2_ALL);	
+	GPIO_SetBits(LED_2_PORT, LED_2_ALL);
+	//GPIO_SetBits(LED_3_PORT, LED_3_PIN);
+	//GPIO_SetBits(LED_4_PORT, LED_4_PIN);	
 
 	return;
 }
@@ -68,6 +102,8 @@ void LED_Init(void)
 void LED_Interrupt(void)
 {
     register u16 counter = (u16)(g_jiffies & LED_JIFFIES_MASK);
+
+	/* TODO: SHUTDOWN ALL LED */
 
     /* shut led 1 */
     LED_LIGHTSHUT(LED_1_PORT, LED_1_ALL);
@@ -101,17 +137,29 @@ void LED_Interrupt(void)
         LED_LIGHTUP(LED_2_PORT, LED_2_BLUE);
     }
 
+	/*
+	if (g_LED3 > counter){
+		LED_LIGHTUP(LED_3_PORT, LED_3_PIN);
+	}
+
+	if (g_LED4 > counter){
+		LED_LIGHTUP(LED_4_PORT, LED_4_PIN);
+	} */
+
     return;
 }
 
-void LED_SetColor(u16 led1, u16 led2)
+void LED_SetColor(u32 color)
 {
-	g_LED1_R = LED_GET_RED(led1); 
-	g_LED1_G = LED_GET_GREEN(led1); 
-	g_LED1_B = LED_GET_BLUE(led1); 
-	g_LED2_R = LED_GET_RED(led2); 
-	g_LED2_G = LED_GET_GREEN(led2); 
-	g_LED2_B = LED_GET_BLUE(led2); 
+	g_LED1_R = LED1_GET_RED(color); 
+	g_LED1_G = LED1_GET_GREEN(color); 
+	g_LED1_B = LED1_GET_BLUE(color); 
+	g_LED2_R = LED2_GET_RED(color); 
+	g_LED2_G = LED2_GET_GREEN(color); 
+	g_LED2_B = LED2_GET_BLUE(color);
+	g_LED3   = LED3_GET_COLOR(color); 
+	g_LED4   = LED4_GET_COLOR(color); 
+
 	return;
 }
 

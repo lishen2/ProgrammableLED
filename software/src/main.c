@@ -33,15 +33,13 @@ int main()
 	BTN_Init();
   	LED_Init();
 
-	LED_SetColor(0x0555, 0x0555);
+	LED_SetColor(0x00555555);
 	delay_ms(500);
-	LED_SetColor(0, 0);
+	LED_SetColor(0);
 
 	while(1){
 		STATE_Poll();
 	}
-
-    return 0;
 }
 
 #ifdef __GNUC__

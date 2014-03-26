@@ -1,0 +1,39 @@
+Partlist exported from /Users/lishen/Documents/eagle/SmartLED/2.sch at 14-3-25 下午7:53
+
+Part Value                         Device                        Package               Description                                 PROD_ID   VALUE     
+C1   22uF                          10UF-16V-10%(TANT)            EIA3216               CAP-00811                                   CAP-00811 10uF      
+C2   10uF                          10UF-16V-10%(TANT)            EIA3216               CAP-00811                                   CAP-00811 10uF      
+C3   0.1u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C4   0.1u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C5   100uF                         47UF-TANT                     EIA3528               47uF Tantalum SMT                           CAP-08310 47uF      
+C6   10u                           C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C7   0.1u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C8   0.1u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C9   0.1u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+C10  4.7u                          C-EUC0603K                    C0603K                CAPACITOR, European symbol                                      
+D1   BAT20JFILM                    BAT20JFILM                    SOD-323               23V, 1A Schottky diode, SOD-323 package     DIO-11623 BAT20JFILM
+F1   500ma                         L-EUL2012C                    L2012C                INDUCTOR, European symbol                                       
+IC1  STM32F10XCXT6                 STM32F10XCXT6                 TQFP48                ST STM32F101/103 48pin LQFP                                     
+IC2  ADXL345"                      ADXL345"                      ADXL3451:1            3-axis SPI/I2C 2/4/8/16g accelerometer                          
+IC3                                BL8530-XX2_RN                 SOT23-5               PFC step-up DC boost                                            
+JP1                                M03PTH                        1X03                  Header 3                                                        
+JP2  M02PTH                        M02PTH                        1X02                  Standard 2-pin 0.1" header. Use with                            
+JP3                                M04PTH                        1X04                  Header 4                                                        
+JP4  M02PTH                        M02PTH                        1X02                  Standard 2-pin 0.1" header. Use with                            
+L1   22uh                          INDUCTORVLF4012A              VLF4012A              Inductors                                                       
+LED1 LED-TRICOLOR-5050NO_IC        LED-TRICOLOR-5050NO_IC        LED-TRICOLOR-5050                                                                     
+LED2 LED-TRICOLOR-5050NO_IC        LED-TRICOLOR-5050NO_IC        LED-TRICOLOR-5050                                                                     
+LED3                               LED1206                       LED-1206              LEDs                                                            
+LED4                               LED1206                       LED-1206              LEDs                                                            
+R1   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R2   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R3   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R4   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R5   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R6   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R7   10K                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R8   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R9   270                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R10  10K                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+R11  10K                           R-EU_R0603                    R0603                 RESISTOR, European symbol                                       
+S1   SWITCH-MOMENTARY-2-SMD-1101NE SWITCH-MOMENTARY-2-SMD-1101NE TACTILE-SWITCH-1101NE Various NO switches- pushbuttons, reed, etc                     
