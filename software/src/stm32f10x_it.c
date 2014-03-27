@@ -146,37 +146,6 @@ void SysTick_Handler(void)
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
 
-/*******************************************************************************
-* Function Name  : USB_HP_CAN1_TX_IRQHandler
-* Description    : This function handles USB High Priority or CAN TX interrupts requests
-*                  requests.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void USB_HP_CAN1_TX_IRQHandler(void)
-{
-//  CTR_HP();
-}
-
-/*******************************************************************************
-* Function Name  : USB_IRQHandler
-* Description    : This function handles USB Low Priority interrupts
-*                  requests.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void USB_LP_CAN1_RX0_IRQHandler(void)
-{
-//	NUSB_LP_INT();
-}
-/*
-void USBWakeUp_IRQHandler(void)
-{
-  EXTI_ClearITPendingBit(EXTI_Line18);
-}
-*/
 
 /**
   * @brief  This function handles USART2 global interrupt request.

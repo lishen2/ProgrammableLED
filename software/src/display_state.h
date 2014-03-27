@@ -10,9 +10,8 @@ enum DISPLAY_STATE
 	STATE_MAX,
 };
 
-void STATE_Change(void);
+void STATE_NextState(void);
 void STATE_SetState(int state);
-void STATE_Poll(void);
 
 #endif
 

@@ -25,7 +25,6 @@ static void _initTimer(void)
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	NVIC_InitTypeDef         NVIC_InitStructure;
 
-	//TIM3用于在定时更新图片
 	RCC_APB1PeriphClockCmd(BTN_ANTISHAKE_RCC, ENABLE);
 
 	NVIC_InitStructure.NVIC_IRQChannel = BTN_ANTISHAKE_IRQ;
@@ -55,15 +54,12 @@ static void _initButton(void)
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	//设置gpio
 	RCC_APB2PeriphClockCmd(BTN_BUTTON_RCC, ENABLE);
 
 	GPIO_InitStructure.GPIO_Pin = BTN_BUTTON_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(BTN_BUTTON_PORT, &GPIO_InitStructure);	
-
-	//配置GPIOC的7号针脚为7号中断线
 	GPIO_EXTILineConfig(BTN_BUTTON_PORTSOURCE, BTN_BUTTON_PINSOURCE); 
 
     NVIC_InitStructure.NVIC_IRQChannel = BTN_BUTTON_IRQ;
@@ -88,7 +84,6 @@ void BTN_Init(void)
 	return;
 }
 
-
 void BTN_BUTTON_IRQROUTINE(void)
 {
 	if (SET == EXTI_GetFlagStatus(BTN_BUTTON_EXTILINE)){
@@ -107,10 +102,10 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 
 		TIM_Cmd(BTN_ANTISHAKE_TIMER, DISABLE);
 
-		//check if the button is still pressed
+		//check if the button is still pushed
 		if (Bit_RESET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
-			STATE_Change();
+			STATE_NextState();
 		}
 	}//if	
 }

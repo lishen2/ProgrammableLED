@@ -6,8 +6,6 @@ vu32 g_jiffies = 0;
 /* 公共的硬件初始化，当前仅初始化了外设总线 */
 void HW_CommonInit(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-
     /* 设置2bit可抢占，2bit不可抢占 */  
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	return;
@@ -16,7 +14,7 @@ void HW_CommonInit(void)
 //初始化systick
 void HW_InitSysTick(void)
 {
-    /* Setup SysTick Timer for 1 msec interrupts  */
+    /* Setup SysTick Timer for 0.5 msec interrupts  */
     if (SysTick_Config(4000)) 
     { 
         /* Capture error */ 

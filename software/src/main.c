@@ -9,6 +9,7 @@
 #include "acc_sensor.h"
 #include "display_state.h"
 #include "button.h"
+#include "sequence.h"
 
 int main()
 {
@@ -18,28 +19,15 @@ int main()
 
 	printf("Init finished.\r\n");
 
-/*
-	curZ = lastZ = 0;
-	while(1){
-		curZ = ACC_ReadZ();
-		if (abs(curZ - lastZ) > 2000){
-			printf("%hu\r\n", curZ);
-		}
-		lastZ = curZ;
-		
-		delay_10ms(100); 
-	}
-*/
 	BTN_Init();
   	LED_Init();
+    SEQ_Init();
 
-	LED_SetColor(0x00555555);
-	delay_ms(500);
-	LED_SetColor(0);
+//	LED_SetColor(0x00555555);
+//	delay_ms(500);
+//	LED_SetColor(0);
 
-	while(1){
-		STATE_Poll();
-	}
+	while(1);
 }
 
 #ifdef __GNUC__

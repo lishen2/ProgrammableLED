@@ -1,17 +1,13 @@
 #ifndef _SEQUENCE_H_
 #define _SEQUENCE_H_
 
-#define SEQ_LED_SEQUENCE_LEN       94
+void SEQ_Init(void);
 
-extern u32 g_bicycleSeq[SEQ_LED_SEQUENCE_LEN];
-extern u32 g_leftSeq[SEQ_LED_SEQUENCE_LEN];
-extern u32 g_rightSeq[SEQ_LED_SEQUENCE_LEN];
+void SEQ_EnableDisplay(void);
+void SEQ_DisableDisplay(void);
 
 void SEQ_SetDelayTime(u32 delay);
-
-void SEQ_DisplayBicycle(void);
-void SEQ_DisplayLeft(void);
-void SEQ_DisplayRight(void);
+void SEQ_SetCurMode(int mode);
 
 #endif
 
