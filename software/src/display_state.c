@@ -32,6 +32,8 @@ void STATE_SetState(int state)
 
 void STATE_NextState(void)
 {
+	STATE_SetState(g_DisState);
+
 	if (STATE_MAX == g_DisState + 1){
 		g_DisState = STATE_GRADIENTER;
 	} else {

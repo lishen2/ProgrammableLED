@@ -28,8 +28,11 @@
 
 当前进度
 --------
-20120217: 第一版PCB制作完成.                     
-20120220: 编写代码，STM32的USB驱动示例代码很烂，作为程序员不忍直视。
+20140217: 第一版PCB制作完成.                     
+20140220: 编写代码，STM32的USB驱动示例代码很烂，作为程序员不忍直视。
+20140319: 放弃使用USB口，原因是USB驱动比较复杂一直没有调试成功。
+20140329: 第二版PCB制作完成，放弃USB接口，增加加速度传感器ADXL234和升压电路（保证LED亮度一致）
+
 
 开发博客
 --------
@@ -64,8 +67,10 @@ Hardware
 
 Current progress
 ---------------
-20120217: Finished first PCB.                
-20120220: Working on the code, STM32's USB Driver is horrible. 
+20140217: Finished first PCB.                
+20140220: Working on the code, STM32's USB Driver is horrible. 
+20140319: Abandon USB port, too complicated.
+20140329: Finished second PCB, abandon USB port, add ADXL234 sensor, and boost circuit.
 
 Development blog
 ---------------

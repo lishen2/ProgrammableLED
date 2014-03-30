@@ -10,6 +10,7 @@
 #include "display_state.h"
 #include "button.h"
 #include "sequence.h"
+#include "command.h"
 
 int main()
 {
@@ -23,11 +24,9 @@ int main()
   	LED_Init();
     SEQ_Init();
 
-//	LED_SetColor(0x00555555);
-//	delay_ms(500);
-//	LED_SetColor(0);
-
-	while(1);
+	while(1){
+		CMD_HandleCommand();
+	}
 }
 
 #ifdef __GNUC__

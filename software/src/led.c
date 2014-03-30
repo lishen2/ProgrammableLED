@@ -29,29 +29,8 @@
 #define LED_4_RCC   RCC_APB2Periph_GPIOB
 #define LED_4_PIN  
 
-/* color 4 bits pre color, and we use the 4 LSB to represent red */
-#define LED1_RED_MASK          0x0000000F
-#define LED1_GREEN_MASK        0x000000F0
-#define LED1_BLUE_MASK         0x00000F00
-#define LED2_RED_MASK          0x0000F000
-#define LED2_GREEN_MASK        0x000F0000
-#define LED2_BLUE_MASK         0x00F00000
-#define LED3_MASK              0x0F000000
-#define LED4_MASK			   0xF0000000
-
-#define LED_BITS_PRECOLOR     4
-
 /* jiffies mask */
 #define LED_JIFFIES_MASK      LED1_RED_MASK
-
-#define LED1_GET_RED(color)    ((color & LED1_RED_MASK)   >> 0*LED_BITS_PRECOLOR)
-#define LED1_GET_GREEN(color)  ((color & LED1_GREEN_MASK) >> 1*LED_BITS_PRECOLOR)
-#define LED1_GET_BLUE(color)   ((color & LED1_BLUE_MASK)  >> 2*LED_BITS_PRECOLOR)
-#define LED2_GET_RED(color)    ((color & LED2_RED_MASK)   >> 3*LED_BITS_PRECOLOR)
-#define LED2_GET_GREEN(color)  ((color & LED2_GREEN_MASK) >> 4*LED_BITS_PRECOLOR)
-#define LED2_GET_BLUE(color)   ((color & LED2_BLUE_MASK)  >> 5*LED_BITS_PRECOLOR)
-#define LED3_GET_COLOR(color)  ((color & LED3_MASK)       >> 6*LED_BITS_PRECOLOR)
-#define LED4_GET_COLOR(color)  ((color & LED4_MASK)       >> 7*LED_BITS_PRECOLOR)
 
 /* store led color */
 static u8 g_LED1_R;
