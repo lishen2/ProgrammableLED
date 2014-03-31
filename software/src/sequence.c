@@ -11,17 +11,11 @@
   #define FLASH_PAGE_SIZE    ((uint16_t)0x400)
 #endif
 
-/* stm32f107带了256kb的flash，
-   分为两部分0~192KB用于存放程序，
-   后面64KB用于存放配置数据 */
+/* 板子使用48脚的stm32，因此是中低密度芯片，
+   带了64kb的flash, 使用最后一页1024字节存放闪烁数据 */
    
 /* flash中用于存放数据的位置 */
-#define SEQ_DATA_START_ADDRESS  (0x8000000 + 0x30000)
-/* 数据写入的结束地址 */
-#define SEQ_DATA_END_ADDRESS    (SEQ_DATA_START_ADDRESS + 3 * SEQ_LED_SEQUENCE_LEN)
-/* 数据占用的页数 */
-#define SEQ_DATA_PAGES          ((sizeof(ConfigInfo) / FLASH_PAGE_SIZE) + 1)
-
+#define SEQ_DATA_START_ADDRESS  (0x8000000 + 0xFC00)
 
 #define SEQ_LED_DEFAYLT_DELAYTIME  60
 
@@ -98,9 +92,9 @@ static void _initTimer(void)
 
 static void _restoreSeq(void)
 {
-	memcpy(g_bicycleSeq, (void*)CONFIG_DATA_START_ADDRESS + 0*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);
-	memcpy(g_leftSeq, (void*)CONFIG_DATA_START_ADDRESS +  1*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN); 
-	memcpy(g_leftSeq, (void*)CONFIG_DATA_START_ADDRESS +  2*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);	
+	memcpy(g_bicycleSeq, (void*)SEQ_DATA_START_ADDRESS + 0*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);
+	memcpy(g_leftSeq,    (void*)SEQ_DATA_START_ADDRESS + 1*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN); 
+	memcpy(g_rightSeq,   (void*)SEQ_DATA_START_ADDRESS + 2*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);	
 
 	return;
 }
@@ -190,31 +184,36 @@ void SEQ_DISPLAY_IRQROUTINE(void)
 	return;	
 }
 
+void _writeData(u32 addr, u8* data, int len)
+{
+    int offset;
+
+    /* 长度和地址必须为4的整数倍 */
+    addr = addr & 0xFFFFFFFC;
+    len  = len & 0xFFFFFFFC;
+    offset += 4;
+    while(offset < len)
+    {
+        FLASH_ProgramWord(addr + offset, (u32)data + offset);
+        offset += 4;
+    }
+    
+    return;
+}
+
 void SEQ_SaveToFlash(void)
 {
-    volatile FLASH_Status status;
-    int count, write_addr, read_addr;
+    FLASH_Status status;
+    int offset;
 
 	/* 解锁flash */
     FLASH_UnlockBank1();
 
     /* 先擦除 */
-    status = FLASH_COMPLETE;
-    for(count = 0; (count < CONFIG_DATA_PAGES) && (status == FLASH_COMPLETE); count++)
-    {
-        status = FLASH_ErasePage(CONFIG_DATA_START_ADDRESS + (FLASH_PAGE_SIZE * count));
-    }
-
+    FLASH_ErasePage(SEQ_DATA_START_ADDRESS);
+    
     /* 按字写入 */
-    status = FLASH_COMPLETE;
-    write_addr = CONFIG_DATA_START_ADDRESS;
-    read_addr = (int)&g_conf;
-    while((write_addr < CONFIG_DATA_END_ADDRESS) && (status == FLASH_COMPLETE))
-    {
-        status = FLASH_ProgramWord(write_addr, *((u32*)read_addr));
-        write_addr = write_addr + 4;
-        read_addr = read_addr + 4;
-    }
+    _writeData(SEQ_DATA_START_ADDRESS);   
 
     FLASH_LockBank1();
 
