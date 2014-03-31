@@ -17,6 +17,10 @@
 /* flash中用于存放数据的位置 */
 #define SEQ_DATA_START_ADDRESS  (0x8000000 + 0xFC00)
 
+#define SEQ_BICYCLE_BUFFER_ADDRESS  (SEQ_DATA_START_ADDRESS + 0 * SEQ_LED_SEQUENCE_LEN)
+#define SEQ_LEFT_BUFFER_ADDRESS     (SEQ_DATA_START_ADDRESS + 1 * SEQ_LED_SEQUENCE_LEN)
+#define SEQ_RIGHT_BUFFER_ADDRESS	(SEQ_DATA_START_ADDRESS + 2 * SEQ_LED_SEQUENCE_LEN)
+
 #define SEQ_LED_DEFAYLT_DELAYTIME  60
 
 u32 g_bicycleSeq[SEQ_LED_SEQUENCE_LEN];
@@ -92,9 +96,9 @@ static void _initTimer(void)
 
 static void _restoreSeq(void)
 {
-	memcpy(g_bicycleSeq, (void*)SEQ_DATA_START_ADDRESS + 0*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);
-	memcpy(g_leftSeq,    (void*)SEQ_DATA_START_ADDRESS + 1*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN); 
-	memcpy(g_rightSeq,   (void*)SEQ_DATA_START_ADDRESS + 2*SEQ_LED_SEQUENCE_LEN, SEQ_LED_SEQUENCE_LEN);	
+	memcpy(g_bicycleSeq, (void*)SEQ_BICYCLE_BUFFER_ADDRESS, SEQ_LED_SEQUENCE_LEN);
+	memcpy(g_leftSeq,    (void*)SEQ_LEFT_BUFFER_ADDRESS,    SEQ_LED_SEQUENCE_LEN); 
+	memcpy(g_rightSeq,   (void*)SEQ_RIGHT_BUFFER_ADDRESS,   SEQ_LED_SEQUENCE_LEN);	
 
 	return;
 }
@@ -203,9 +207,6 @@ void _writeData(u32 addr, u8* data, int len)
 
 void SEQ_SaveToFlash(void)
 {
-    FLASH_Status status;
-    int offset;
-
 	/* 解锁flash */
     FLASH_UnlockBank1();
 
@@ -213,7 +214,9 @@ void SEQ_SaveToFlash(void)
     FLASH_ErasePage(SEQ_DATA_START_ADDRESS);
     
     /* 按字写入 */
-    _writeData(SEQ_DATA_START_ADDRESS);   
+    _writeData(SEQ_BICYCLE_BUFFER_ADDRESS, (u8*)g_bicycleSeq, SEQ_LED_SEQUENCE_LEN);
+	_writeData(SEQ_LEFT_BUFFER_ADDRESS, (u8*)g_leftSeq, SEQ_LED_SEQUENCE_LEN);
+	_writeData(SEQ_RIGHT_BUFFER_ADDRESS, (u8*)g_rightSeq, SEQ_LED_SEQUENCE_LEN);  
 
     FLASH_LockBank1();
 
