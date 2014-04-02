@@ -3,14 +3,14 @@
 #include "button.h"
 #include "display_state.h"
 
-#define BTN_BUTTON_PIN         GPIO_Pin_0
-#define BTN_BUTTON_PORT        GPIOA 
-#define BTN_BUTTON_RCC         RCC_APB2Periph_GPIOA
-#define BTN_BUTTON_PORTSOURCE  GPIO_PortSourceGPIOA
-#define BTN_BUTTON_PINSOURCE   GPIO_PinSource0
-#define BTN_BUTTON_IRQ 		   EXTI0_IRQn
-#define BTN_BUTTON_IRQROUTINE  EXTI0_IRQHandler
-#define BTN_BUTTON_EXTILINE    EXTI_Line0
+#define BTN_BUTTON_PIN         GPIO_Pin_2
+#define BTN_BUTTON_PORT        GPIOB 
+#define BTN_BUTTON_RCC         RCC_APB2Periph_GPIOB
+#define BTN_BUTTON_PORTSOURCE  GPIO_PortSourceGPIOB
+#define BTN_BUTTON_PINSOURCE   GPIO_PinSource2
+#define BTN_BUTTON_IRQ 		   EXTI2_IRQn
+#define BTN_BUTTON_IRQROUTINE  EXTI2_IRQHandler
+#define BTN_BUTTON_EXTILINE    EXTI_Line2
 
 #define BTN_ANTISHAKE_TIMER      TIM2
 #define BTN_ANTISHAKE_RCC        RCC_APB1Periph_TIM2
@@ -70,7 +70,7 @@ static void _initButton(void)
 
 	EXTI_InitStructure.EXTI_Line = BTN_BUTTON_EXTILINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; 
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; 
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 

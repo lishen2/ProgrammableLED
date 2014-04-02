@@ -59,7 +59,7 @@ void xl345Init(void)
 	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;	 		               //串行时钟在不操作时，时钟为高电平
 	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;		               //第二个时钟沿开始采样数据
 	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;			               //NSS信号由软件（使用SSI位）管理
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128; 
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16; 
 	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;				   //数据传输从MSB位开始
 	SPI_InitStructure.SPI_CRCPolynomial = 7;						   //CRC值计算的多项式
 	SPI_Init(SPI1, &SPI_InitStructure);
@@ -107,7 +107,7 @@ void xl345Write(unsigned char count, unsigned char *buf)
 void xl345Setup(void)
 {
     u8 buffer[8];
-    /* add soft ware reset */
+    /* add software reset */
 
     /*--------------------------------------------------
     TAP Configuration
@@ -152,6 +152,7 @@ void xl345Setup(void)
     buffer[1] =                   /* BW_RATE */
                 XL345_RATE_100 | XL345_LOW_NOISE;
     buffer[2] =                   /* POWER_CTL */
+                XL345_ACT_INACT_SERIAL | XL345_AUTO_SLEEP | 
                 XL345_WAKEUP_8HZ | XL345_MEASURE;
     xl345Write(3,buffer);
 
@@ -162,15 +163,20 @@ void xl345Setup(void)
             	30;		     // number of samples
     xl345Write(2, buffer);
 
+    // set data format
+    buffer[0] = XL345_DATA_FORMAT;
+    buffer[1] = XL345_SPI4WIRE | XL345_INT_HIGH | XL345_10BIT |
+                XL345_DATA_JUST_RIGHT | XL345_RANGE_2G;
+    xl345Write(2, buffer);
+
     //set interrupt map
     buffer[0] = XL345_INT_MAP;
-    buffer[1] = XL345_ACTIVITY | XL345_INACTIVITY; //send activity and inactivity to int2
+    buffer[1] = 0; //all interrupts set to pin INT1
     xl345Write(2, buffer);		
     
     // turn on the interrupts
     buffer[0] = XL345_INT_ENABLE;
-    buffer[1] = XL345_WATERMARK | XL345_DOUBLETAP | 
-                XL345_ACTIVITY | XL345_INACTIVITY;
+    buffer[1] = XL345_ACTIVITY | XL345_INACTIVITY | XL345_WATERMARK; 
     xl345Write(2, buffer);		
 
     xl345Read(1, 0x00, buffer);

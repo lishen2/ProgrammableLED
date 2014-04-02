@@ -4,11 +4,11 @@
 #include "xl345.h"
 
 #define ACC_INT_PIN         GPIO_Pin_0
-#define ACC_INT_PORT        GPIOA 
+#define ACC_INT_PORT        GPIOA
 #define ACC_INT_RCC         RCC_APB2Periph_GPIOA
 #define ACC_INT_PORTSOURCE  GPIO_PortSourceGPIOA
 #define ACC_INT_PINSOURCE   GPIO_PinSource0
-#define ACC_INT_IRQ 		EXTI0_IRQn
+#define ACC_INT_IRQ         EXTI0_IRQn
 #define ACC_INT_IRQROUTINE  EXTI0_IRQHandler
 #define ACC_INT_EXTILINE    EXTI_Line0
 
@@ -34,7 +34,7 @@ static void _initInterrupt(void)
 
 	EXTI_InitStructure.EXTI_Line = ACC_INT_EXTILINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; 
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; 
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
@@ -45,13 +45,12 @@ void ACC_Init(void)
 {
     xl345Init();
     xl345Setup();
-
-	//TODO
-	//_initInterrupt();
+    
+	_initInterrupt();
 
     return;
 }
-
+/*
 u16 ACC_ReadZ(void)
 {
 	u16 Z;
@@ -64,9 +63,8 @@ u16 ACC_ReadZ(void)
 	Z |= ZAry[1]; 
 
 	return Z;
-}
+}*/
 
-/*
 void ACC_INT_IRQROUTINE(void)
 {
 	if (SET == EXTI_GetFlagStatus(ACC_INT_EXTILINE)){
@@ -76,5 +74,4 @@ void ACC_INT_IRQROUTINE(void)
 
 	}	
 }
-	 */
 
