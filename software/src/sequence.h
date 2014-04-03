@@ -12,7 +12,7 @@ void SEQ_Init(void);
 void SEQ_EnableDisplay(void);
 void SEQ_DisableDisplay(void);
 
-void SEQ_SetDelayTime(u32 delay);
+void SEQ_SetDelayTime(u16 delay);
 void SEQ_SetCurMode(int mode);
 
 void SEQ_SaveToFlash(void);

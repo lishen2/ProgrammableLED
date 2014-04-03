@@ -12,6 +12,7 @@ enum DISPLAY_STATE
 
 void STATE_NextState(void);
 void STATE_SetState(int state);
+void STATE_OnDataReady(u16 x, u16 y, u16 z);
 
 #endif
 

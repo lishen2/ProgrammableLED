@@ -43,3 +43,24 @@ void STATE_NextState(void)
 	return;
 }
 
+void STATE_OnDataReady(u16 x, u16 y, u16 z)
+{
+    u16 max = 0;
+
+    if (x > max){
+        max = x;
+    } 
+
+    if (y > max){
+        max = y;
+    }
+
+    if (z > max){
+        max = z;
+    }
+
+    
+    
+    return;
+}
+

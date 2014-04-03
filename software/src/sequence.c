@@ -111,15 +111,18 @@ void SEQ_Init(void)
     return;
 }
 
-void SEQ_SetDelayTime(u32 delay)
+void SEQ_SetDelayTime(u16 delay)
 {
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-    
+
+    /* 
 	TIM_TimeBaseStructure.TIM_Period = delay;	
 	TIM_TimeBaseStructure.TIM_Prescaler = 8000;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; 
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
-	TIM_TimeBaseInit(SEQ_DISPLAY_TIMER, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(SEQ_DISPLAY_TIMER, &TIM_TimeBaseStructure);¡¢
+    */
+    SEQ_DISPLAY_TIMER->ARR = delay;
     
     return;
 }
