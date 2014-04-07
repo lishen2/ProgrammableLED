@@ -5,29 +5,29 @@
 #define LED_1_PORT  GPIOB
 #define LED_1_RCC   RCC_APB2Periph_GPIOB
 
-#define LED_1_RED   GPIO_Pin_14
-#define LED_1_GREEN GPIO_Pin_13
-#define LED_1_BLUE	GPIO_Pin_15
+#define LED_1_RED   GPIO_Pin_13
+#define LED_1_GREEN GPIO_Pin_12
+#define LED_1_BLUE	GPIO_Pin_14
 #define LED_1_ALL   (LED_1_RED|LED_1_GREEN|LED_1_BLUE)
 
-#define LED_2_PORT  GPIOA
-#define LED_2_RCC   RCC_APB2Periph_GPIOA
+#define LED_2_PORT  GPIOB
+#define LED_2_RCC   RCC_APB2Periph_GPIOB
 
-#define LED_2_RED    GPIO_Pin_4 
-#define LED_2_GREEN	 GPIO_Pin_3 
-#define LED_2_BLUE	 GPIO_Pin_5
+#define LED_2_RED    GPIO_Pin_6
+#define LED_2_GREEN	 GPIO_Pin_7 
+#define LED_2_BLUE	 GPIO_Pin_4
 #define LED_2_ALL    (LED_2_RED|LED_2_GREEN|LED_2_BLUE)
 
 #define LED_LIGHTUP(port, pin)   (port->BRR = pin)
 #define LED_LIGHTSHUT(port, pin) (port->BSRR = pin)
 
-#define LED_3_PORT  GOIOB
+#define LED_3_PORT  GPIOB
 #define LED_3_RCC   RCC_APB2Periph_GPIOB
-#define LED_3_PIN  
+#define LED_3_PIN   GPIO_Pin_8
 
-#define LED_4_PORT  GOIOB
+#define LED_4_PORT  GPIOB
 #define LED_4_RCC   RCC_APB2Periph_GPIOB
-#define LED_4_PIN  
+#define LED_4_PIN  	GPIO_Pin_15
 
 /* jiffies mask */
 #define LED_JIFFIES_MASK      LED1_RED_MASK
@@ -58,7 +58,6 @@ void LED_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(LED_2_PORT, &GPIO_InitStructure);
 
-/*  TODO
 	GPIO_InitStructure.GPIO_Pin = LED_3_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
@@ -68,12 +67,11 @@ void LED_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(LED_4_PORT, &GPIO_InitStructure);
-*/
 
 	GPIO_SetBits(LED_1_PORT, LED_1_ALL);	
 	GPIO_SetBits(LED_2_PORT, LED_2_ALL);
-	//GPIO_SetBits(LED_3_PORT, LED_3_PIN);
-	//GPIO_SetBits(LED_4_PORT, LED_4_PIN);	
+	GPIO_SetBits(LED_3_PORT, LED_3_PIN);
+	GPIO_SetBits(LED_4_PORT, LED_4_PIN);	
 
 	return;
 }
@@ -116,14 +114,13 @@ void LED_Interrupt(void)
         LED_LIGHTUP(LED_2_PORT, LED_2_BLUE);
     }
 
-	/*
 	if (g_LED3 > counter){
 		LED_LIGHTUP(LED_3_PORT, LED_3_PIN);
 	}
 
 	if (g_LED4 > counter){
 		LED_LIGHTUP(LED_4_PORT, LED_4_PIN);
-	} */
+	}
 
     return;
 }

@@ -3,9 +3,9 @@
 #include "xl345.h"
 
 /* ¿ØÖÆxl345 csµÄGPIOÒý½Å */
-#define XL345_CS_PIN   GPIO_Pin_1
-#define XL345_CS_PORT  GPIOA 
-#define XL345_CS_CLOCK RCC_APB2Periph_GPIOA
+#define XL345_CS_PIN   GPIO_Pin_0
+#define XL345_CS_PORT  GPIOB 
+#define XL345_CS_CLOCK RCC_APB2Periph_GPIOB
 
 #define XL345_DISABLE() GPIO_SetBits(XL345_CS_PORT, XL345_CS_PIN); 
 #define XL345_ENABLE()  GPIO_ResetBits(XL345_CS_PORT, XL345_CS_PIN);
