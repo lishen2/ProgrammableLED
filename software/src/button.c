@@ -70,7 +70,7 @@ static void _initButton(void)
 
 	EXTI_InitStructure.EXTI_Line = BTN_BUTTON_EXTILINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; 
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; 
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
@@ -92,6 +92,8 @@ void BTN_BUTTON_IRQROUTINE(void)
 		//start timer	
 		TIM_SetCounter(BTN_ANTISHAKE_TIMER, BTN_ANTISHAEK_TIME);
 		TIM_Cmd(BTN_ANTISHAKE_TIMER, ENABLE);
+		printf("SHAKE\r\n");
+
 	}	
 }
 
@@ -105,6 +107,7 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 		//check if the button is still pushed
 		if (Bit_RESET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
+			printf("BTN\r\n");
 			STATE_NextState();
 		}
 	}//if	

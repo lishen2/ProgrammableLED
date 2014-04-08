@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "stm32f10x.h"
+#include "utils.h"
 #include "acc_sensor.h"
 #include "xl345.h"
 #include "power.h"
@@ -55,6 +56,11 @@ static void _xl345Setup(void)
 {
     u8 buffer[8];
     /* add software reset */
+	buffer[0] = XL345_RESERVED1;
+	buffer[1] = XL345_SOFT_RESET;
+	xl345Write(2,buffer);
+
+	delay_ms(200);
 
     /*--------------------------------------------------
     TAP Configuration
@@ -105,7 +111,7 @@ static void _xl345Setup(void)
 
     // set the FIFO control
     buffer[0] = XL345_FIFO_CTL;
-    buffer[1] = XL345_FIFO_MODE_STREAM | // set FIFO mode
+    buffer[1] = XL345_FIFO_MODE_FIFO    | // set FIFO mode
             	0 | 		             // link to INT1
             	ACC_FIFO_LENGTH;		 // number of samples
     xl345Write(2, buffer);
@@ -123,7 +129,7 @@ static void _xl345Setup(void)
     
     // turn on the interrupts
     buffer[0] = XL345_INT_ENABLE;
-    buffer[1] = XL345_ACTIVITY | XL345_INACTIVITY | XL345_WATERMARK; 
+    buffer[1] = XL345_ACTIVITY | XL345_INACTIVITY | XL345_WATERMARK | XL345_SINGLETAP | XL345_DATAREADY |XL345_DOUBLETAP; 
     xl345Write(2, buffer);		
 
     xl345Read(1, 0x00, buffer);
@@ -145,7 +151,7 @@ static void _handleWatermark(void)
 {
 	u8 buf[6];
     u16 x, y, z;
-    s32 avX, avY, avZ, sign;
+    s32 avX, avY, avZ;
     int i;
 
     avX = 0;
@@ -170,7 +176,7 @@ static void _handleWatermark(void)
     return;
 }
 
-static u8 _handle_IRQ(void)
+static void _handle_IRQ(void)
 {
     u8 source;
 

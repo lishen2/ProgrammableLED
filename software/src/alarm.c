@@ -1,4 +1,4 @@
-#include <math.h>
+#include <stdlib.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "alarm.h"
@@ -22,13 +22,13 @@ enum ALARM_STATE{
 };
 
 static u32 g_alarmStatic[ALARM_PATTERN_LENGTH] = 
-{};
+{0};
 
 static u32 g_alarmCaution1[ALARM_PATTERN_LENGTH] = 
-{};
+{0};
 
 static u32 g_alarmCaution2[ALARM_PATTERN_LENGTH] = 
-{};
+{0};
 
 static u32 *g_curBuf;
 static u32 g_curPos;
@@ -40,34 +40,34 @@ static void _initAlarmTimer(void)
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	NVIC_InitTypeDef         NVIC_InitStructure;
 
-	RCC_APB1PeriphClockCmd(BREAK_LIGHT_TIM_RCC, ENABLE);
+	RCC_APB1PeriphClockCmd(ALARM_TIM_RCC, ENABLE);
 
-	NVIC_InitStructure.NVIC_IRQChannel = BREAK_LIGHT_TIM_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannel = ALARM_TIM_IRQ;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	TIM_DeInit(BREAK_LIGHT_TIMER);	
+	TIM_DeInit(ALARM_TIMER);	
 	TIM_TimeBaseStructure.TIM_Period = ALARM_TIMER_DELAY;	
 	TIM_TimeBaseStructure.TIM_Prescaler = 8000;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; 
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
-	TIM_TimeBaseInit(BREAK_LIGHT_TIMER, &TIM_TimeBaseStructure);
-	TIM_ARRPreloadConfig(BREAK_LIGHT_TIMER, ENABLE);
-	TIM_SetCounter(BREAK_LIGHT_TIMER, ALARM_TIMER_DELAY);
+	TIM_TimeBaseInit(ALARM_TIMER, &TIM_TimeBaseStructure);
+	TIM_ARRPreloadConfig(ALARM_TIMER, ENABLE);
+	TIM_SetCounter(ALARM_TIMER, ALARM_TIMER_DELAY);
 
-	TIM_Cmd(BREAK_LIGHT_TIMER, ENABLE);
-	TIM_ITConfig(BREAK_LIGHT_TIMER, TIM_IT_Update, ENABLE);
+	TIM_Cmd(ALARM_TIMER, ENABLE);
+	TIM_ITConfig(ALARM_TIMER, TIM_IT_Update, ENABLE);
 	
 	return;
 }
 
 static void _deinitAlarmTimer(void)
 {
-	TIM_Cmd(BREAK_LIGHT_TIMER, DISABLE);
-	TIM_ITConfig(BREAK_LIGHT_TIMER, TIM_IT_Update, DISABLE);
-	RCC_APB1PeriphClockCmd(BREAK_LIGHT_TIM_RCC, DISABLE);
+	TIM_Cmd(ALARM_TIMER, DISABLE);
+	TIM_ITConfig(ALARM_TIMER, TIM_IT_Update, DISABLE);
+	RCC_APB1PeriphClockCmd(ALARM_TIM_RCC, DISABLE);
     return;
 }
 
