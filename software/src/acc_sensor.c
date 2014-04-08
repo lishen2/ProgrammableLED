@@ -199,7 +199,7 @@ void ACC_INT_IRQROUTINE(void)
 {
 	if (SET == EXTI_GetFlagStatus(ACC_INT_EXTILINE)){
 		EXTI_ClearFlag(ACC_INT_EXTILINE);
-		
+		printf("INT\r\n");
 		//handle irq here
         _handle_IRQ();
 	}	
