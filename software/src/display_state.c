@@ -2,30 +2,45 @@
 #include "utils.h"
 #include "led.h"
 #include "display_state.h"
-#include "sequence.h"
+#include "break_light.h"
+#include "alarm.h"
 
-static int g_DisState = STATE_GRADIENTER;
+static vs32 g_DisState = STATE_BREAK_LIGHT;
 
 void STATE_SetState(int state)
 {
-	g_DisState = state;
+    if (state == g_DisState){
+        return;
+    }
 
-	switch(state)
-	{
-	    case STATE_GRADIENTER:
+    //stop old display mode
+    switch(g_DisState){
+        case STATE_BREAK_LIGHT:
         {
-            SEQ_DisableDisplay();
-			break;
+            BKL_Stop();
+            break;
         }
-		case STATE_BICYCLE_LIGHT:
-		case STATE_LEFT:
-		case STATE_RIGHT:
-		{
-            SEQ_SetCurMode(state);
-			SEQ_EnableDisplay();
-			break;
-		}
-	};
+        case STATE_ALARM:
+        {
+            ALARM_Stop();
+            break;
+        }        
+    };
+
+    //start new display mode
+  	g_DisState = state;
+    switch(state){
+        case STATE_BREAK_LIGHT:
+        {
+            BKL_Start();
+            break;
+        }
+        case STATE_ALARM:
+        {
+            ALARM_Start();
+            break;
+        }        
+    };
 
 	return;
 }
@@ -35,7 +50,7 @@ void STATE_NextState(void)
 	STATE_SetState(g_DisState);
 
 	if (STATE_MAX == g_DisState + 1){
-		g_DisState = STATE_GRADIENTER;
+		g_DisState = STATE_BREAK_LIGHT;
 	} else {
 		g_DisState++;
 	}
@@ -44,22 +59,20 @@ void STATE_NextState(void)
 }
 
 void STATE_OnDataReady(u16 x, u16 y, u16 z)
-{
-    u16 max = 0;
-
-    if (x > max){
-        max = x;
-    } 
-
-    if (y > max){
-        max = y;
-    }
-
-    if (z > max){
-        max = z;
-    }
-
-    
+{  
+    switch(g_DisState)
+    {
+        case STATE_BREAK_LIGHT:
+        {
+            BKL_OnData(x, y, z);
+            break;
+        }
+        case STATE_ALARM:
+        {
+            ALARM_OnData(x, y, z);
+            break;
+        }
+    };
     
     return;
 }

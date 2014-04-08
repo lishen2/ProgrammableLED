@@ -9,8 +9,6 @@
 #include "acc_sensor.h"
 #include "display_state.h"
 #include "button.h"
-#include "sequence.h"
-#include "command.h"
 
 int main()
 {
@@ -20,25 +18,12 @@ int main()
 
 	printf("Init finished.\r\n");
 
-	//BTN_Init();
+	BTN_Init();
   	LED_Init();
-    //SEQ_Init();
 
 	while(1){
-		//CMD_HandleCommand();
-		LED_SetColor(0x0000000F);
-		delay_ms(1000);
-		LED_SetColor(0x000000F0);
-		delay_ms(1000);
-		LED_SetColor(0x00000F00);
-		delay_ms(1000);
-		LED_SetColor(0x0000F000);
-		delay_ms(1000);
-		LED_SetColor(0x000F0000);
-		delay_ms(1000);
-		LED_SetColor(0x00F00000);
-		delay_ms(1000);
-	}
+        /* TODO, GOTO sleep */
+    }
 }
 
 #ifdef __GNUC__
