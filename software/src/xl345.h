@@ -194,7 +194,7 @@
 
 void xl345Init(void);
 void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf);
-void xl345Write(unsigned char count, unsigned char *buf);
+void xl345Write(unsigned char count, unsigned char regaddr, unsigned char *buf);
 
 #endif
 

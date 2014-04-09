@@ -1,28 +1,29 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "ringbuf.h"
 #include "usart_io.h"
-#include "led.h"
 #include "acc_sensor.h"
 #include "display_state.h"
 #include "button.h"
-#include "xl345.h"
+#include "led.h"
 
 int main()
 {
 	HW_CommonInit();
 	HW_InitSysTick();
 	USARTIO_InitUSART1();
-  	LED_Init();    
+  	LED_Init();  
+	ACC_Init();  
     STATE_Init();
 	BTN_Init();
 
 	printf("Init finished.\r\n");
 
-	while(1){}
+	while(1){
+		STATE_Poll();
+		delay_ms(100);
+	}
 }
 
 #ifdef __GNUC__

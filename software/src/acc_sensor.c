@@ -4,7 +4,6 @@
 #include "acc_sensor.h"
 #include "xl345.h"
 #include "power.h"
-#include "display_state.h"
 
 #define ACC_INT_PIN         GPIO_Pin_0
 #define ACC_INT_PORT        GPIOA
@@ -15,9 +14,7 @@
 #define ACC_INT_IRQROUTINE  EXTI0_IRQHandler
 #define ACC_INT_EXTILINE    EXTI_Line0
 
-#define ACC_FIFO_LENGTH_SHIFT 3
-/* how many elements used in fifo */
-#define ACC_FIFO_LENGTH      (1<<ACC_FIFO_LENGTH_SHIFT)
+ACC_IRQHandler g_handler = NULL;
 
 static void _initInterrupt(void)
 {
@@ -47,14 +44,13 @@ static void _initInterrupt(void)
 
 	return;
 }
-
+#if 0
 static void _xl345Setup(void)
 {
     u8 buffer[8];
     /* add software reset */
-	buffer[0] = XL345_RESERVED1;
-	buffer[1] = XL345_SOFT_RESET;
-	xl345Write(2,buffer);
+	buffer[0] = XL345_SOFT_RESET;
+	xl345Write(1, XL345_RESERVED1, buffer);
 
 	delay_ms(200);
 
@@ -116,38 +112,37 @@ static void _xl345Setup(void)
     xl345Write(1, XL345_INT_MAP, buffer);		
     
     // turn on the interrupts
-    buffer[0] = XL345_INT_ENABLE;
-    buffer[1] = XL345_ACTIVITY | XL345_INACTIVITY | 
-                XL345_WATERMARK | XL345_SINGLETAP;
-    xl345Write(2, buffer);		
+    buffer[0] = XL345_ACTIVITY | XL345_INACTIVITY | 
+                XL345_WATERMARK;
+    xl345Write(1, XL345_INT_ENABLE, buffer);		
 
     xl345Read(1, 0x00, buffer);
     printf("Read device id: [%hhu]\r\n", buffer[0]);
     
     return;
 }
+#endif
 
 void ACC_Init(void)
 {
     xl345Init();
 	_initInterrupt();
-    _xl345Setup();
 
     return;
 }
 
-static void _handleWatermark(void)
+void ACC_ReadAcc(u8 fifoLen, s16 *X, s16 *Y, s16*Z)
 {
 	u8 buf[6];
     u16 x, y, z;
     s32 avX, avY, avZ;
-    int i;
+    u8 i;
 
     avX = 0;
     avY = 0;
     avZ = 0;
     
-    for (i = 0; i < ACC_FIFO_LENGTH; ++i){
+    for (i = 0; i < fifoLen; ++i){
         xl345Read(sizeof(buf), XL345_DATAX0, buf);
         x = (buf[1] << 8 | buf[0]);
         y = (buf[3] << 8 | buf[2]);        
@@ -158,13 +153,13 @@ static void _handleWatermark(void)
         avZ += (s32)(s16)z;        
     }
 
-    STATE_OnDataReady(avX/ACC_FIFO_LENGTH, /* leave the optimizing job to compiler */
-                      avY/ACC_FIFO_LENGTH, 
-                      avZ/ACC_FIFO_LENGTH);
+	*X = (s16)(avX/fifoLen);
+	*Y = (s16)(avY/fifoLen);
+	*Z = (s16)(avZ/fifoLen);
 
     return;
 }
-
+#if 0
 static void _handle_IRQ(void)
 {
     u8 source;
@@ -192,12 +187,27 @@ static void _handle_IRQ(void)
 
     return;
 }
+#endif
+
+void ACC_SetIRQHandler(ACC_IRQHandler handler)
+{
+	g_handler = handler;
+}
 
 void ACC_INT_IRQROUTINE(void)
 {
+	u8 irq;
+
 	if (SET == EXTI_GetFlagStatus(ACC_INT_EXTILINE)){
 		EXTI_ClearFlag(ACC_INT_EXTILINE);
-        _handle_IRQ();
+
+	    /* read int source */
+		xl345Read(1, XL345_INT_SOURCE, &irq);
+
+		/* call handler */
+		if (NULL != g_handler){
+			g_handler(irq);
+		}
 	}	
 }
 

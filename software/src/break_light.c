@@ -2,58 +2,33 @@
 #include "utils.h"
 #include "break_light.h"
 #include "led.h"
+#include "app_intf.h"
 
-#define BREAK_LIGHT_TIMER          TIM3
-#define BREAK_LIGHT_TIM_RCC        RCC_APB1Periph_TIM3
-#define BREAK_LIGHT_TIM_IRQ        TIM3_IRQn
-#define BREAK_LIGHT_TIM_ROUTINE    TIM3_IRQHandler
+static void _BKL_Start(void);
+static void _BKL_Stop(void);
+static void _BKL_Periodic(void);
 
-#define BREAK_LIGHT_DEFAULT_DELAYTIME  60
-
-static void _initTimer(void)
+struct APP_INTF g_appBreakLight = 
 {
-	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-	NVIC_InitTypeDef         NVIC_InitStructure;
+	_BKL_Start,
+	_BKL_Stop,
+	_BKL_Periodic
+};
 
-	RCC_APB1PeriphClockCmd(BREAK_LIGHT_TIM_RCC, ENABLE);
-
-	NVIC_InitStructure.NVIC_IRQChannel = BREAK_LIGHT_TIM_IRQ;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-
-	TIM_DeInit(BREAK_LIGHT_TIMER);	
-	TIM_TimeBaseStructure.TIM_Period = BREAK_LIGHT_DEFAULT_DELAYTIME;	
-	TIM_TimeBaseStructure.TIM_Prescaler = 8000;
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; 
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
-	TIM_TimeBaseInit(BREAK_LIGHT_TIMER, &TIM_TimeBaseStructure);
-	TIM_ARRPreloadConfig(BREAK_LIGHT_TIMER, ENABLE);
-	TIM_SetCounter(BREAK_LIGHT_TIMER, BREAK_LIGHT_DEFAULT_DELAYTIME);
-
-	TIM_Cmd(BREAK_LIGHT_TIMER, DISABLE);
-	TIM_ITConfig(BREAK_LIGHT_TIMER, TIM_IT_Update, DISABLE);
-	
-	return;
-}
-
-void BKL_Start(void)
-{
-	TIM_Cmd(BREAK_LIGHT_TIMER, ENABLE);
-	TIM_ITConfig(BREAK_LIGHT_TIMER, TIM_IT_Update, ENABLE);
-    return;
-}
-
-void BKL_Stop(void)
-{
-	TIM_Cmd(BREAK_LIGHT_TIMER, DISABLE);
-	TIM_ITConfig(BREAK_LIGHT_TIMER, TIM_IT_Update, DISABLE);
-    return;
-}
-
-void BKL_OnData(u16 x, u16 y, u16 z)
+static void _BKL_Start(void)
 {
     return;
 }
+
+static void _BKL_Stop(void)
+{
+    return;
+}
+
+static void _BKL_Periodic(void)
+{
+
+}
+
+
 

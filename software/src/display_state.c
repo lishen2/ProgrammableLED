@@ -1,11 +1,12 @@
 #include "stm32f10x.h"
 #include "utils.h"
-#include "led.h"
 #include "display_state.h"
+#include "app_intf.h"
 #include "break_light.h"
 #include "alarm.h"
 
 static vs32 g_DisState;
+static u32 g_StateCount;
 
 void STATE_SetState(int state)
 {
@@ -17,12 +18,12 @@ void STATE_SetState(int state)
     switch(g_DisState){
         case STATE_BREAK_LIGHT:
         {
-            BKL_Stop();
+            g_appBreakLight.Stop();            
             break;
         }
         case STATE_ALARM:
         {
-            ALARM_Stop();
+			g_appAlarm.Stop();
             break;
         }        
     };
@@ -32,12 +33,12 @@ void STATE_SetState(int state)
     switch(state){
         case STATE_BREAK_LIGHT:
         {
-            BKL_Start();
+            g_appBreakLight.Start();
             break;
         }
         case STATE_ALARM:
         {
-            ALARM_Start();
+            g_appAlarm.Start();
             break;
         }        
     };
@@ -47,39 +48,39 @@ void STATE_SetState(int state)
 
 void STATE_NextState(void)
 {
-    g_DisState++;
+    g_StateCount++;
     
-	if (STATE_MAX == g_DisState){
-		g_DisState = STATE_BREAK_LIGHT;
+	if (STATE_MAX == g_StateCount){
+		g_StateCount = STATE_BREAK_LIGHT;
 	}
 
-	STATE_SetState(g_DisState);
+	STATE_SetState(g_StateCount);
 
 	return;
 }
 
-void STATE_OnDataReady(u16 x, u16 y, u16 z)
-{  
-    switch(g_DisState)
-    {
+void STATE_Poll(void)
+{
+    switch(g_DisState){
         case STATE_BREAK_LIGHT:
         {
-            BKL_OnData(x, y, z);
+            g_appBreakLight.Periodic();            
             break;
         }
         case STATE_ALARM:
         {
-            ALARM_OnData(x, y, z);
+			g_appAlarm.Periodic();
             break;
-        }
+        }        
     };
-    
-    return;
 }
 
 void STATE_Init(void)
 {
-  	g_DisState = STATE_BREAK_LIGHT;       
-    BKL_Start();
+  	g_DisState = STATE_BREAK_LIGHT; 
+	g_StateCount = STATE_BREAK_LIGHT;     
+    g_appBreakLight.Start();
+
+	return;
 }
 

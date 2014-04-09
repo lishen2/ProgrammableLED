@@ -1,28 +1,41 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "alarm.h"
 #include "led.h"
+#include "acc_sensor.h"
+#include "app_intf.h"
+#include "xl345.h"
+
+static void _ALARM_Start(void);
+static void _ALARM_Stop(void);
+static void _ALARM_Periodic(void);
+struct APP_INTF g_appAlarm =
+{
+	_ALARM_Start,
+    _ALARM_Stop,
+	_ALARM_Periodic
+};
 
 #define ALARM_TIMER          TIM4
 #define ALARM_TIM_RCC        RCC_APB1Periph_TIM4
 #define ALARM_TIM_IRQ        TIM4_IRQn
 #define ALARM_TIM_ROUTINE    TIM4_IRQHandler
 
-#define ALARM_THRESHOLD_CAUTION1  300
-#define ALARM_THRESHOLD_CAUTION2  1000
-
 #define ALARM_TIMER_DELAY      60
 #define ALARM_PATTERN_LENGTH   64
 
-enum ALARM_STATE{
-    ALARM_STATE_STATIC,
-    ALARM_STATE_CAUTION1,
-    ALARM_STATE_CAUTION2,    
-};
-
 static u32 g_alarmStatic[ALARM_PATTERN_LENGTH] = 
-{0};
+{
+	0x00000100, 0x00000200, 0x00000300, 0x00000500, 0x00000700, 0x00000900, 0x00000B00, 0x00000D00,
+	0x00000F10, 0x00000D20, 0x00000B30, 0x00000950, 0x00000570, 0x00000390, 0x000002B0, 0x000001D0,
+	0x000000F0, 0x000000D0, 0x000000B0, 0x00000090, 0x00000050, 0x00000030, 0x00000020, 0x00000010,
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+};
 
 static u32 g_alarmCaution1[ALARM_PATTERN_LENGTH] = 
 {0};
@@ -32,8 +45,6 @@ static u32 g_alarmCaution2[ALARM_PATTERN_LENGTH] =
 
 static u32 *g_curBuf;
 static u32 g_curPos;
-
-static int g_status = ALARM_STATE_STATIC;
 
 static void _initAlarmTimer(void)
 {
@@ -73,7 +84,6 @@ static void _deinitAlarmTimer(void)
 
 static void _enterStatic(void)
 {
-    g_status = ALARM_STATE_STATIC;
     g_curBuf = g_alarmStatic;
     g_curPos = 0;
     return;
@@ -81,7 +91,6 @@ static void _enterStatic(void)
 
 static void _enterCaution1(void)
 {
-    g_status = ALARM_STATE_CAUTION1;
     g_curBuf = g_alarmCaution1;
     g_curPos = 0;
     return;
@@ -89,46 +98,51 @@ static void _enterCaution1(void)
 
 static void _enterCatuion2(void)
 {
-    g_status = ALARM_STATE_CAUTION2;
     g_curBuf = g_alarmCaution2;   
     g_curPos = 0;
     return;
 }
 
-void ALARM_Start(void)
+static void _alarmIRQHandler(u8 irq)
 {
-    _enterStatic();
-    _initAlarmTimer();  
+    /* into low power mode */
+    if (irq & XL345_SINGLETAP){
+        printf("Single Tap.\r\n");                
+    }
+
+	return;
+}
+
+static void _setupAccSensor(void)
+{
+
+	return;
+}
+
+static void _ALARM_Start(void)
+{
+	//set irq handler
+	ACC_SetIRQHandler(_alarmIRQHandler);
+
+	_setupAccSensor();
+
+    _enterStatic();  
+
+	_initAlarmTimer();
+
     return;
 }
 
-void ALARM_Stop(void)
+static void _ALARM_Stop(void)
 {
     _deinitAlarmTimer();
     LED_SetColor(0x00);
     return;
 }
 
-void ALARM_OnData(u16 x, u16 y, u16 z)
+static void _ALARM_Periodic(void)
 {
-    u32 acc;
 
-    acc = abs(x) + abs(y) + abs(z);
-    
-    if (acc >= ALARM_THRESHOLD_CAUTION2 && 
-        ALARM_STATE_CAUTION2 != g_status){
-        _enterCatuion2();
-    } 
-    else if (acc >= ALARM_THRESHOLD_CAUTION1 && 
-             acc < ALARM_THRESHOLD_CAUTION2  && 
-             ALARM_STATE_CAUTION1 != g_status){
-        _enterCaution1();
-    } 
-    else if (ALARM_STATE_STATIC != g_status){
-        _enterStatic();
-    }
-
-    return;
 }
 
 void ALARM_TIM_ROUTINE(void)
