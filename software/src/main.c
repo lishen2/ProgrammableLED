@@ -13,32 +13,16 @@
 
 int main()
 {
-	u8 buf[6];
-    u16 x, y, z;
-
 	HW_CommonInit();
 	HW_InitSysTick();
-	USARTIO_InitUSART1();;
-	ACC_Init();
+	USARTIO_InitUSART1();
+  	LED_Init();    
+    STATE_Init();
+	BTN_Init();
 
 	printf("Init finished.\r\n");
 
-	BTN_Init();
-  	LED_Init();
-
-#define ACC_DATAMASK_10BIT_JUST_RIGHT    0x83FF
-
-	while(1){
-        /* TODO, GOTO sleep */
-        xl345Read(sizeof(buf), XL345_DATAX0, buf);
-        x = (buf[1] << 8 | buf[0]) & ACC_DATAMASK_10BIT_JUST_RIGHT;
-        y = (buf[3] << 8 | buf[2]) & ACC_DATAMASK_10BIT_JUST_RIGHT;        
-        z = (buf[5] << 8 | buf[4]) & ACC_DATAMASK_10BIT_JUST_RIGHT; 
-
-		printf("x:%hd, y:%hd, z:%hd\r\n", (s16)x, (s16)y, (s16)z);
-
-		delay_ms(2000);
-    }
+	while(1){}
 }
 
 #ifdef __GNUC__

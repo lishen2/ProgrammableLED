@@ -48,6 +48,9 @@ void LED_Init(void)
 
 	RCC_APB2PeriphClockCmd(LED_1_RCC | LED_2_RCC | LED_3_RCC | LED_4_RCC, ENABLE);
 
+    /* disable JTAG, leave only SWD, we use PB4 as LED2 Blue */
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
 	GPIO_InitStructure.GPIO_Pin = LED_1_ALL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
@@ -138,5 +141,4 @@ void LED_SetColor(u32 color)
 
 	return;
 }
-
 

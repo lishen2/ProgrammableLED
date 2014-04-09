@@ -87,13 +87,13 @@ void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf)
 	return;
 }
 
-void xl345Write(unsigned char count, unsigned char *buf)
+void xl345Write(unsigned char count, unsigned char addr, unsigned char *buf)
 {
 	int i;
 
 	XL345_ENABLE();
 
-	_spi_ReadWriteByte(buf[0]|0x40);
+	_spi_ReadWriteByte(addr|0x40);
 
 	//write data
 	for(i = 0; i < count; ++i){

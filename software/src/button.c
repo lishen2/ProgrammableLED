@@ -20,7 +20,7 @@
 // unit ms
 #define BTN_ANTISHAEK_TIME       50
 
-static void _initTimer(void)
+static void _initAntiShakeTimer(void)
 {
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	NVIC_InitTypeDef         NVIC_InitStructure;
@@ -79,7 +79,7 @@ static void _initButton(void)
 
 void BTN_Init(void)
 {
-	_initTimer();
+	_initAntiShakeTimer();
 	_initButton();
 	return;
 }
@@ -93,7 +93,6 @@ void BTN_BUTTON_IRQROUTINE(void)
 		TIM_SetCounter(BTN_ANTISHAKE_TIMER, BTN_ANTISHAEK_TIME);
 		TIM_Cmd(BTN_ANTISHAKE_TIMER, ENABLE);
 		printf("SHAKE\r\n");
-
 	}	
 }
 

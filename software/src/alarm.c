@@ -79,7 +79,7 @@ static void _enterStatic(void)
     return;
 }
 
-static void _enteryCaution1(void)
+static void _enterCaution1(void)
 {
     g_status = ALARM_STATE_CAUTION1;
     g_curBuf = g_alarmCaution1;
@@ -87,7 +87,7 @@ static void _enteryCaution1(void)
     return;
 }
 
-static void _entryCatuion2(void)
+static void _enterCatuion2(void)
 {
     g_status = ALARM_STATE_CAUTION2;
     g_curBuf = g_alarmCaution2;   
@@ -99,7 +99,6 @@ void ALARM_Start(void)
 {
     _enterStatic();
     _initAlarmTimer();  
-    
     return;
 }
 
@@ -118,12 +117,12 @@ void ALARM_OnData(u16 x, u16 y, u16 z)
     
     if (acc >= ALARM_THRESHOLD_CAUTION2 && 
         ALARM_STATE_CAUTION2 != g_status){
-        _entryCatuion2();
+        _enterCatuion2();
     } 
     else if (acc >= ALARM_THRESHOLD_CAUTION1 && 
-               acc < ALARM_THRESHOLD_CAUTION2  && 
-               ALARM_STATE_CAUTION1 != g_status){
-        _enteryCaution1();
+             acc < ALARM_THRESHOLD_CAUTION2  && 
+             ALARM_STATE_CAUTION1 != g_status){
+        _enterCaution1();
     } 
     else if (ALARM_STATE_STATIC != g_status){
         _enterStatic();

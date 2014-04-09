@@ -5,7 +5,7 @@
 #include "break_light.h"
 #include "alarm.h"
 
-static vs32 g_DisState = STATE_BREAK_LIGHT;
+static vs32 g_DisState;
 
 void STATE_SetState(int state)
 {
@@ -47,13 +47,13 @@ void STATE_SetState(int state)
 
 void STATE_NextState(void)
 {
-	STATE_SetState(g_DisState);
-
-	if (STATE_MAX == g_DisState + 1){
+    g_DisState++;
+    
+	if (STATE_MAX == g_DisState){
 		g_DisState = STATE_BREAK_LIGHT;
-	} else {
-		g_DisState++;
 	}
+
+	STATE_SetState(g_DisState);
 
 	return;
 }
@@ -75,5 +75,11 @@ void STATE_OnDataReady(u16 x, u16 y, u16 z)
     };
     
     return;
+}
+
+void STATE_Init(void)
+{
+  	g_DisState = STATE_BREAK_LIGHT;       
+    BKL_Start();
 }
 
