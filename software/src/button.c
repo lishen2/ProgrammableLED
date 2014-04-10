@@ -70,7 +70,7 @@ static void _initButton(void)
 
 	EXTI_InitStructure.EXTI_Line = BTN_BUTTON_EXTILINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; 
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; 
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 

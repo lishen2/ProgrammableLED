@@ -21,7 +21,7 @@ struct APP_INTF g_appAlarm =
 #define ALARM_TIM_ROUTINE    TIM4_IRQHandler
 
 #define ALARM_TIMER_DELAY      30
-#define ALARM_TIMER_SLEEP      2000
+#define ALARM_TIMER_SLEEP      5000
 #define ALARM_PATTERN_LENGTH   32
 
 static u32 g_displayBuffer[ALARM_PATTERN_LENGTH] = 
@@ -33,7 +33,7 @@ static u32 g_displayBuffer[ALARM_PATTERN_LENGTH] =
 	0x00E00E00, 0x00C00C00, 0x00B00B00, 0x00A00A00, 
 	0x00900900, 0x00800800, 0x00700700, 0x00600600,
 	0x00500500, 0x00400400, 0x00300300, 0x00200200, 
-	0x00a00100, 0x00000000, 0x00000000, 0x00000000,
+	0x00100100, 0x00000000, 0x00000000, 0x00000000,
 };
 static u32 g_bufferPos;
 
@@ -75,7 +75,6 @@ static void _deinitAlarmTimer(void)
 
 static void _ALARM_Start(void)
 {
-    g_displayBuffer = g_alarmStatic;
     g_bufferPos = 0;
 	_initAlarmTimer();
     

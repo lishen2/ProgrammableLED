@@ -2,8 +2,11 @@
 #include "stm32f10x.h"
 #include "utils.h"
 #include "break_light.h"
+#include "xl345.h"
 #include "led.h"
 #include "app_intf.h"
+#include "acc_sensor.h"
+#include "power.h"
 
 #define BKL_FIFO_LENGTH 8
 
@@ -16,7 +19,6 @@ static s16 g_lastZ;
 
 static void _BKL_Start(void);
 static void _BKL_Stop(void);
-static void _BKL_Periodic(void);
 
 struct APP_INTF g_appBreakLight = 
 {
@@ -54,21 +56,21 @@ static void _deceleration1(void)
 static void _deceleration2(void)
 {
     BKL_CLEAR_BREAKLIGHT(g_ledColor);
-    g_ledColor &= 0xFF00F00F;
+    g_ledColor |= 0xFF00F00F;
     LED_SetColor(g_ledColor); 
 }
 
 static void acceleration(void)
 {
     BKL_CLEAR_BREAKLIGHT(g_ledColor);
-    g_ledColor &= 0x00A01A01;
+    g_ledColor |= 0x00A01A01;
     LED_SetColor(g_ledColor); 
 }
 
 static void _constantSpeed(void)
 {
     BKL_CLEAR_BREAKLIGHT(g_ledColor);
-    g_ledColor &= 0x00001001;    
+    g_ledColor |= 0x00001001;    
     LED_SetColor(g_ledColor);         
 }
 
@@ -78,7 +80,7 @@ static void _onDataReady(void)
     s16 zDiff;
 
     ACC_ReadAcc(BKL_FIFO_LENGTH, &x, &y, &z);
-    printf("X:%hs Y:%hs Z:%hs\r\n", x, y, z);
+    printf("X:%hd Y:%hd Z:%hd\r\n", x, y, z);
 
     /* Z axis calculate */
     zDiff = z - g_lastZ;
@@ -99,10 +101,10 @@ static void _onDataReady(void)
     g_lastZ = z;
 
     /* Y axis calculate */
-    if (y > 10){
-        _turnLeft();
-    } else (y < -10){
+    if (y > 20){
         _turnRight();
+    } else if (y < -20){
+        _turnLeft();
     } else {
         _straightAhead();
     }
@@ -192,8 +194,10 @@ static void _BKLInitAccSensor(void)
 
 static void _BKLDeinitAccSensor(void)
 {
+	u8 reset = XL345_SOFT_RESET;
+
     /* just reset */
-	xl345Write(1, XL345_RESERVED1, XL345_SOFT_RESET);
+	xl345Write(1, XL345_RESERVED1, &reset);
 	delay_ms(50);
 
     return;

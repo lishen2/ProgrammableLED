@@ -106,32 +106,32 @@ void LED_IRQHandler(void)
     } 
 
     if (g_LED1_G > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_1_GREEN;
     }
 
     if (g_LED1_B > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_1_BLUE;
     } 
 
     /* light up the color */
     if (g_LED2_R > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_2_RED;
     } 
 
     if (g_LED2_G > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_2_GREEN;
     }
 
     if (g_LED2_B > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_2_BLUE;
     }
 
 	if (g_LED3 > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_3_PIN;
 	}
 
 	if (g_LED4 > counter){
-        outreg |= LED_1_RED;
+        outreg |= LED_4_PIN;
 	}
 
 	/* SHUTDOWN ALL LED */
