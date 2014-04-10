@@ -1,30 +1,27 @@
-可编程的LED
+自动刹车灯
 ===============
-可编程的LED是一个小巧的电路板，有两颗全彩LED灯。它提供了一个Mmacro USB接口，可以连接到电脑，通过简单编程控制LED灯的闪烁。
+自动刹车灯是一个小巧的电路板，在加减速或者转弯的时候自动亮起。可以将其安装在自行车上，用于警示其他车辆和行人。自动刹车灯由电池供电并内置加速度传感器，因此无需额外连接其他线缆。
 ![image](https://raw.github.com/lishen2/ProgrammableLED/master/images/IMG_0546.png)
 
-设计目标
+特性
 --------
 * 体积2.8cm * 5.5cm(PCB尺寸)。
-* 设计使用两节5号电池。
-* 通过USB接口对灯进行编程（设备会被识别成U盘，无需驱动）。
+* 能识别加减速和转向。
+* 设计使用两节5号电池，长电池寿命，停车自动休眠。
 * 软硬件设计开源。
 
 应用
 -------
 * 自行车灯，提高车辆夜间识别度，增强安全性。
-* 冒充汽车防盗器，吓走不怀好意者。
 * 玩具。
 
 硬件资源
 --------
-* STM32f103c8t处理器
-* 两个全彩LED灯
-* 一个macro USB接口
+* STM32F103C8T处理器
+* 两个全彩LED灯，两个红色LED
+* 加速度传感器ADXL345
 * 一个三线串口
-* 一个SWD接口（包括SWO）
-* 五个GPIO
-* 震动开关
+* 一个三线SWD接口
 
 当前进度
 --------
@@ -32,38 +29,35 @@
 20140220: 编写代码，STM32的USB驱动示例代码很烂，作为程序员不忍直视。
 20140319: 放弃使用USB口，原因是USB驱动比较复杂一直没有调试成功。
 20140329: 第二版PCB制作完成，放弃USB接口，增加加速度传感器ADXL234和升压电路（保证LED亮度一致）
-
+20140410：还在编写软件，放弃编程功能，仅留下刹车灯功能。
 
 开发博客
 --------
 <http://blog.sina.com.cn/lgeek>
 
-Programmable LED
+Automatic Break Light
 ===============
-ProgrammableLED is a small circuit board with two RGB LEDs. It provide a macro USB port, we can connect it to computer to programme LED flash pattern.
+Automatic Break Light is a small circuit board, it can light up when decelerate or turn. It can installed on a bicycle, to caution other bicycle,  vehicle and people. Automatic Break Light has an accelerate sensor on board, so it will work on it's own and don't need to connect to other part of the bike.
 
 Design feature
 --------------
 * size 2.8cm * 5.5cm(PCB size).
-* use 2 AA batteries.
-* programming through macro USB port(device will be recognized as USB massive storage device).
+* recognize accelerate, decelerate and turn.
+* use 2 AA batteries, long battery life, and automatic sleep when stop.
 * open source on both hardware and software.
 
 Application
 -----------
 * Bicycle light, improve identification at night.
-* Fake car alarm, scare away bad guys.
 * Toys.
 
 Hardware
 --------
-* STM32f103c8t MCU
-* 2 RGB LED
-* 1 macro USB port
-* 1 usart port
-* 1 SWD(including SWO)
-* 5 GPIO
-* Vibration switch
+* STM32F103C8T MCU
+* 2 RGB LED, 2 red LED
+* ADXL345 acceleration sensor
+* 1 USART port
+* 1 SWD
 
 Current progress
 ---------------
@@ -71,6 +65,7 @@ Current progress
 20140220: Working on the code, STM32's USB Driver is horrible. 
 20140319: Abandon USB port, too complicated.
 20140329: Finished second PCB, abandon USB port, add ADXL234 sensor, and boost circuit.
+20140410：Still working on software, just break light
 
 Development blog
 ---------------
