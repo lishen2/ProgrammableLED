@@ -13,6 +13,15 @@
 /* 延时使用的计数器 */
 extern vu32 g_jiffies;
 
+static inline void PWR_EnterSLEEPMode(void)
+{
+
+    SCB->SCR |= SCB_SCR_SLEEPONEXIT;   // Set SLEEPONEXIT                       
+    SCB->SCR &= ~SCB_SCR_SLEEPDEEP;    // Clear SLEEPDEEP bit
+
+    __WFI();                           // Request Wait For Interrupt
+}
+
 /* 将字符转换为其对应的数字，可以处理16进制和大小写 */
 static inline unsigned char UTILS_Char2Num(unsigned char ch){
 	

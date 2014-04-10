@@ -21,8 +21,7 @@ int main()
 	printf("Init finished.\r\n");
 
 	while(1){
-		STATE_Poll();
-		delay_ms(100);
+        PWR_EnterSLEEPMode();
 	}
 }
 
@@ -38,4 +37,3 @@ PUTCHAR_PROTOTYPE
 	USARTIO_SendChar(USART1, ch);
 	return(ch);
 }
-

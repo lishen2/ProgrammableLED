@@ -5,7 +5,6 @@ struct APP_INTF
 {
 	void (*Start)(void);
 	void (*Stop)(void);
-	void (*Periodic)(void);
 };
 
 #endif

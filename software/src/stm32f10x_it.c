@@ -139,7 +139,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	++g_jiffies;
-    LED_Interrupt();
+    LED_IRQHandler();
 }
 
 /******************************************************************************/

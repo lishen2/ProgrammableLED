@@ -10,7 +10,6 @@ enum DISPLAY_STATE
 
 void STATE_Init(void);
 void STATE_NextState(void);
-void STATE_Poll(void);
 
 #endif
 

@@ -58,7 +58,7 @@ static void _initButton(void)
 
 	GPIO_InitStructure.GPIO_Pin = BTN_BUTTON_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	GPIO_Init(BTN_BUTTON_PORT, &GPIO_InitStructure);	
 	GPIO_EXTILineConfig(BTN_BUTTON_PORTSOURCE, BTN_BUTTON_PINSOURCE); 
 
@@ -79,8 +79,8 @@ static void _initButton(void)
 
 void BTN_Init(void)
 {
-	_initAntiShakeTimer();
 	_initButton();
+	_initAntiShakeTimer();
 	return;
 }
 
@@ -103,7 +103,7 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 		TIM_Cmd(BTN_ANTISHAKE_TIMER, DISABLE);
 
 		//check if the button is still pushed
-		if (Bit_RESET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
+		if (Bit_SET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
 			STATE_NextState();
 		}

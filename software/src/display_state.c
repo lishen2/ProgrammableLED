@@ -59,22 +59,6 @@ void STATE_NextState(void)
 	return;
 }
 
-void STATE_Poll(void)
-{
-    switch(g_DisState){
-        case STATE_BREAK_LIGHT:
-        {
-            g_appBreakLight.Periodic();            
-            break;
-        }
-        case STATE_ALARM:
-        {
-			g_appAlarm.Periodic();
-            break;
-        }        
-    };
-}
-
 void STATE_Init(void)
 {
   	g_DisState = STATE_BREAK_LIGHT; 
