@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "button.h"
 #include "display_state.h"
+#include "power.h"
 
 #define BTN_BUTTON_PIN         GPIO_Pin_2
 #define BTN_BUTTON_PORT        GPIOB 
@@ -48,6 +49,24 @@ static void _initAntiShakeTimer(void)
 	return;
 }	  
 
+static void _deinitAntiShakeTimer(void)
+{
+	NVIC_InitTypeDef         NVIC_InitStructure;
+
+	NVIC_InitStructure.NVIC_IRQChannel = BTN_ANTISHAKE_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	TIM_Cmd(BTN_ANTISHAKE_TIMER, DISABLE);
+	TIM_ITConfig(BTN_ANTISHAKE_TIMER, TIM_IT_Update, DISABLE);
+
+	RCC_APB1PeriphClockCmd(BTN_ANTISHAKE_RCC, DISABLE);
+	
+	return;
+}	  
+
 static void _initButton(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -77,11 +96,38 @@ static void _initButton(void)
 	return;
 }
 
+static void _deinitButton(void)
+{
+	EXTI_InitTypeDef EXTI_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+    NVIC_InitStructure.NVIC_IRQChannel = BTN_BUTTON_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+	EXTI_InitStructure.EXTI_Line = BTN_BUTTON_EXTILINE;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; 
+	EXTI_InitStructure.EXTI_LineCmd = DISABLE;
+	EXTI_Init(&EXTI_InitStructure);
+
+	return;
+}
+
 void BTN_Init(void)
 {
 	_initButton();
 	_initAntiShakeTimer();
 	return;
+}
+
+void BTN_Deinit(void)
+{
+    _deinitAntiShakeTimer();
+    _deinitButton();
+    return;
 }
 
 void BTN_BUTTON_IRQROUTINE(void)
@@ -105,7 +151,7 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 		//check if the button is still pushed
 		if (Bit_SET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
-			STATE_NextState();
+//			STATE_NextState();
 		}
 	}//if	
 }

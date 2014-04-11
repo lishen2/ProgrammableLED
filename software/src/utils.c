@@ -33,7 +33,7 @@ void HW_CommonInit(void)
 void HW_InitSysTick(void)
 {
     /* Setup SysTick Timer for 0.5 msec interrupts  */
-    if (SysTick_Config(4000)) 
+    if (SysTick_Config(8000)) 
     { 
         /* Capture error */ 
         while (1);
@@ -47,7 +47,7 @@ void HW_InitSysTick(void)
 /* ∫¡√Îº∂—” ± */
 void delay_ms(int n)
 {
-	n <<= 1;
+	//n <<= 1;
 	n += g_jiffies;
 
     //PWR_PrepareSleep(0);

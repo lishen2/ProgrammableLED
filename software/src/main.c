@@ -16,12 +16,12 @@ int main()
   	LED_Init();  
 	ACC_Init();  
     STATE_Init();
-	BTN_Init();
+//	BTN_Init();
 
 	printf("Init finished.\r\n");
 
 	while(1){
-        PWR_EnterSLEEPMode();
+//        PWR_EnterSLEEPMode();
 	}
 }
 

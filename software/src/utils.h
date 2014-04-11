@@ -1,6 +1,9 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
+#define BOOL_TRUE    1
+#define BOOL_FALSE   0
+
 #define ERROR_ERROR -1
 #define ERROR_FAILED ERROR_ERROR
 #define ERROR_SUCCESS 0
