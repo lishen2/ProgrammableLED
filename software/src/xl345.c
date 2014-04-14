@@ -86,16 +86,10 @@ void xl345Init(void)
 	return;	
 }
 
-void xl345PowerOff(void)
+void xl345Deinit(void)
 {
     SPI_Cmd(XL345_COM_SPI, DISABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, DISABLE);
-}
-
-void xl345PowerOn(void)
-{
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-    SPI_Cmd(XL345_COM_SPI, ENABLE);
 }
 
 void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf)

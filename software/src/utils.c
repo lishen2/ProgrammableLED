@@ -47,13 +47,9 @@ void HW_InitSysTick(void)
 /* ∫¡√Îº∂—” ± */
 void delay_ms(int n)
 {
-	//n <<= 1;
 	n += g_jiffies;
-
-    //PWR_PrepareSleep(0);
     
     while(time_after(n, g_jiffies)){
-        //__WFI();
     }
     
     return;

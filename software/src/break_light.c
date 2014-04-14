@@ -14,7 +14,7 @@
 #define BKL_TIM_ROUTINE    TIM3_IRQHandler
 #define BKL_TIMER_DELAY    1000
 
-#define BKL_FIFO_LENGTH 8
+#define BKL_FIFO_LENGTH    16
 
 #define BKL_TURNLIGHT_MASK   0x000F00F0
 #define BKL_CLEAR_TURNLIGHT(color)  (color &= ~BKL_TURNLIGHT_MASK)
@@ -40,6 +40,7 @@
                                 LED_SetColor(g_ledColor);
 
 #define BKL_LED_CONSTANTSPEED()  BKL_CLEAR_BREAKLIGHT(g_ledColor);  \
+                                 g_ledColor |= 0x00001001;\
                                  LED_SetColor(g_ledColor);
 
 static u32 g_ledColor;
@@ -110,16 +111,16 @@ static void _onDataReady(void)
     s16 zDiff;
 
     ACC_ReadAcc(BKL_FIFO_LENGTH, &x, &y, &z);
-    printf("X:%hd Y:%hd Z:%hd\r\n", x, y, z);
+//    printf("X:%hd Y:%hd Z:%hd\r\n", x, y, z);
 
     /* Z axis calculate */
     zDiff = z - g_lastZ;
     /* zDiff is positive means we are decelerate */
-    if (zDiff >= 10){
+    if (zDiff >= 20){
         BKL_LED_DECELERATION();
     } 
     /* zDiff is negative means we are accelerate */
-    else if (zDiff < -10){
+    else if (zDiff < -15){
         BKL_LED_ACCELERATION();
     }
     else 
@@ -177,7 +178,7 @@ static void _BKLInitAccSensor(void)
     activity - inactivity 
     --------------------------------------------------*/
     /* set up a buffer with all the initialization for activity and inactivity */
-    buffer[0] = 30; /* THRESH_ACT = 80/16 = 5 Gee (1 lsb = 1/16 gee) */
+    buffer[0] = 20; /* THRESH_ACT = 80/16 = 5 Gee (1 lsb = 1/16 gee) */
     buffer[1] = 5; /* THRESH_INACT = 14/16 .25 Gee (1 lsb = 1/16 gee) */
     buffer[2] = 5;/* TIME_INACT - 5 seconds */
     buffer[3] =     /* ACT_INACT_CTL */
@@ -195,7 +196,7 @@ static void _BKLInitAccSensor(void)
     buffer[0] =                   /* BW_RATE */
                 XL345_RATE_200 | XL345_LOW_NOISE;
     buffer[1] =                   /* POWER_CTL */
-                XL345_ACT_INACT_SERIAL | XL345_AUTO_SLEEP | 
+                XL345_ACT_INACT_SERIAL | XL345_AUTO_SLEEP |
                 XL345_WAKEUP_8HZ | XL345_MEASURE;
     xl345Write(2, XL345_BW_RATE, buffer);
 

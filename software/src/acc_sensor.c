@@ -91,8 +91,7 @@ void ACC_INT_IRQROUTINE(void)
 {
 	u8 irq;
 
-	if (SET == EXTI_GetFlagStatus(ACC_INT_EXTILINE)){
-		EXTI_ClearFlag(ACC_INT_EXTILINE);
+	if (SET == EXTI_GetITStatus(ACC_INT_EXTILINE)){
 
 	    /* read int source */
 		xl345Read(1, XL345_INT_SOURCE, &irq);
@@ -101,6 +100,8 @@ void ACC_INT_IRQROUTINE(void)
 		if (NULL != g_handler){
 			g_handler(irq);
 		}
+        
+		EXTI_ClearITPendingBit(ACC_INT_EXTILINE);        
 	}	
 }
 

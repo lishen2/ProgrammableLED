@@ -7,9 +7,12 @@
 #include "display_state.h"
 #include "button.h"
 #include "led.h"
+#include "xl345.h"
 
 int main()
 {
+	u8 buf;
+
 	HW_CommonInit();
 	HW_InitSysTick();
 	USARTIO_InitUSART1();
@@ -21,7 +24,11 @@ int main()
 	printf("Init finished.\r\n");
 
 	while(1){
-//        PWR_EnterSLEEPMode();
+        PWR_EnterSLEEPMode();
+/*
+		xl345Read(1, XL345_DEVID, &buf);
+		printf("%hho\r\n", buf);
+        delay_ms(1000);*/
 	}
 }
 

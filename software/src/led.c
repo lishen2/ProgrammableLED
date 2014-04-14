@@ -162,6 +162,10 @@ void LED_PowerOn(void)
 
 void LED_PowerOff(void)
 {
+    //close all led first
+    GPIO_SetBits(LED_PORT, LED_ALL_PIN);
+
+    //close boost
     GPIO_ResetBits(LED_POWER_PORT, LED_POWER_PIN);
 }
 
