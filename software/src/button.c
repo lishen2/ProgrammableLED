@@ -45,6 +45,7 @@ static void _initAntiShakeTimer(void)
 	TIM_SetCounter(BTN_ANTISHAKE_TIMER, BTN_ANTISHAEK_TIME);
 	TIM_Cmd(BTN_ANTISHAKE_TIMER, DISABLE);
 
+	TIM_ClearITPendingBit(BTN_ANTISHAKE_TIMER, TIM_IT_Update);
 	TIM_ITConfig(BTN_ANTISHAKE_TIMER, TIM_IT_Update, ENABLE);
 	
 	return;

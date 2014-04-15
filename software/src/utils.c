@@ -13,6 +13,8 @@ void HW_CommonInit(void)
 
     /* We didn't use oscillator of any kind, so remap PD0,1 */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE); 
+
     GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
 
     /* set PC13,14,15 to IPD */

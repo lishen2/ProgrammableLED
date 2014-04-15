@@ -33,10 +33,10 @@ int main()
 
 	while(1){
 //        PWR_EnterSLEEPMode();
-/*
+
 		xl345Read(1, XL345_INT_ENABLE, &buf);
 		printf("%hhx\r\n", buf);
-        delay(1555356);*/
+        delay(1555356);
 	}
 }
 
