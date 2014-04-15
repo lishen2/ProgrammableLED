@@ -3,6 +3,7 @@
 #include "button.h"
 #include "display_state.h"
 #include "power.h"
+#include "led.h"
 
 #define BTN_BUTTON_PIN         GPIO_Pin_2
 #define BTN_BUTTON_PORT        GPIOB 
@@ -152,7 +153,8 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 		//check if the button is still pushed
 		if (Bit_SET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
-//			STATE_NextState();
+            PWR_Restore();
+			LED_SetColor(0x11010010);
 		}
 	}//if	
 }

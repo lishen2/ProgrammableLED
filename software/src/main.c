@@ -9,6 +9,14 @@
 #include "led.h"
 #include "xl345.h"
 
+void delay(u32 n)
+{
+	u32 i;
+	for(i = 0; i < n; ++i){
+		for(i = 0; i < n; ++i);	
+	}
+}
+
 int main()
 {
 	u8 buf;
@@ -19,16 +27,16 @@ int main()
   	LED_Init();  
 	ACC_Init();  
     STATE_Init();
-//	BTN_Init();
+	BTN_Init();
 
 	printf("Init finished.\r\n");
 
 	while(1){
-        PWR_EnterSLEEPMode();
+//        PWR_EnterSLEEPMode();
 /*
-		xl345Read(1, XL345_DEVID, &buf);
-		printf("%hho\r\n", buf);
-        delay_ms(1000);*/
+		xl345Read(1, XL345_INT_ENABLE, &buf);
+		printf("%hhx\r\n", buf);
+        delay(1555356);*/
 	}
 }
 

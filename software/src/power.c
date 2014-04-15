@@ -11,7 +11,7 @@ void PWR_LowPower(void)
 {   
 	LED_SetColor(0x00);
     /* disable systick */
-//    SysTick->CTRL &= (~SysTick_CTRL_ENABLE_Msk);
+    SysTick->CTRL &= (~SysTick_CTRL_ENABLE_Msk);
 	
     LED_PowerOff();
 
@@ -22,7 +22,7 @@ void PWR_LowPower(void)
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE); 
     /* enter stop mode */
-    PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);
+    PWR_EnterSTOPMode(PWR_Regulator_ON, PWR_STOPEntry_WFI);
     
     return;
 }
@@ -33,9 +33,8 @@ void PWR_Restore(void)
     
     g_isPowerOff = BOOL_FALSE;
 
-
     /* enable systick */
-//    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
 
     return;
 }

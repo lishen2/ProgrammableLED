@@ -8,6 +8,12 @@
 #include "acc_sensor.h"
 #include "power.h"
 
+enum BKL_Status{
+    BKL_STATUS_CONSTANTSPEED,
+    BKL_LED_ACCELERATION,
+    BKL_LED_DECELERATION,
+};
+
 #define BKL_TIMER          TIM3
 #define BKL_TIM_RCC        RCC_APB1Periph_TIM3
 #define BKL_TIM_IRQ        TIM3_IRQn
@@ -21,11 +27,11 @@
 #define BKL_CLEAR_BREAKLIGHT(color) (color &= BKL_TURNLIGHT_MASK)
 
 #define BKL_LED_TURNLEFT()  BKL_CLEAR_TURNLIGHT(g_ledColor);\
-                            g_ledColor |= 0x000000A0;\
+                            g_ledColor |= 0x00000050;\
                             LED_SetColor(g_ledColor);
 
 #define BKL_LED_TURNRIGHT()  BKL_CLEAR_TURNLIGHT(g_ledColor);\
-                             g_ledColor |= 0x000F0000;\
+                             g_ledColor |= 0x00050000;\
                              LED_SetColor(g_ledColor);
 
 #define BKL_LED_STRAIGHTAHEAD() BKL_CLEAR_TURNLIGHT(g_ledColor);\
@@ -46,6 +52,8 @@
 static u32 g_ledColor;
 static s16 g_lastZ;
 
+static vs32 g_status = BKL_STATUS_CONSTANTSPEED;
+
 static void _BKL_Start(void);
 static void _BKL_Stop(void);
 
@@ -63,22 +71,20 @@ static void _bklTimerInit(void)
 	RCC_APB1PeriphClockCmd(BKL_TIM_RCC, ENABLE);
 
 	NVIC_InitStructure.NVIC_IRQChannel = BKL_TIM_IRQ;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
 	TIM_DeInit(BKL_TIMER);	
-	TIM_TimeBaseStructure.TIM_Period = 0;	
 	TIM_TimeBaseStructure.TIM_Prescaler = 8000;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; 
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
 	TIM_TimeBaseInit(BKL_TIMER, &TIM_TimeBaseStructure);
-	TIM_ARRPreloadConfig(BKL_TIMER, DISABLE);
-	TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
 
-	TIM_Cmd(BKL_TIMER, DISABLE);
-	TIM_ITConfig(BKL_TIMER, TIM_IT_Update, DISABLE);    
+    TIM_ClearFlag(BKL_TIMER, TIM_FLAG_Update);  
+    TIM_ITConfig(BKL_TIMER, TIM_IT_Update, ENABLE); 
+    
     return;
 }
 
@@ -87,8 +93,8 @@ static void _bklTimerDeinit(void)
 	NVIC_InitTypeDef         NVIC_InitStructure;
 
 	NVIC_InitStructure.NVIC_IRQChannel = BKL_TIM_IRQ;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
@@ -102,7 +108,20 @@ static void _bklTimerDeinit(void)
 
 static void _startTimer(void)
 {
-    
+	TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
+	TIM_Cmd(BKL_TIMER, ENABLE);
+
+    return;
+}
+
+void BKL_TIM_ROUTINE(void)
+{
+    if(TIM_GetITStatus(BKL_TIMER, TIM_IT_Update) != RESET){
+        TIM_ClearITPendingBit(BKL_TIMER , TIM_FLAG_Update);
+       	TIM_Cmd(BKL_TIMER, DISABLE);
+        BKL_LED_CONSTANTSPEED();
+        g_status = BKL_STATUS_CONSTANTSPEED;
+    }
 }
 
 static void _onDataReady(void)
@@ -117,26 +136,29 @@ static void _onDataReady(void)
     zDiff = z - g_lastZ;
     /* zDiff is positive means we are decelerate */
     if (zDiff >= 20){
-        BKL_LED_DECELERATION();
+        if (BKL_STATUS_CONSTANTSPEED == g_status){
+            g_status = BKL_LED_DECELERATION;
+            BKL_LED_DECELERATION();
+            _startTimer();
+        }        
     } 
     /* zDiff is negative means we are accelerate */
+    /*
     else if (zDiff < -15){
         BKL_LED_ACCELERATION();
-    }
-    else 
-    {
-        BKL_LED_CONSTANTSPEED();
-    }
+    }*/
+    
     g_lastZ = z;
 
     /* Y axis calculate */
+    /*
     if (y > 20){
         BKL_LED_TURNRIGHT();
     } else if (y < -20){
         BKL_LED_TURNLEFT();
     } else {
         BKL_LED_STRAIGHTAHEAD();
-    }
+    }*/
     
     return;
 }
