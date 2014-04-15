@@ -19,11 +19,11 @@ void delay(u32 n)
 
 int main()
 {
-	u8 buf;
+//	u8 buf;
 
 	HW_CommonInit();
 	HW_InitSysTick();
-	USARTIO_InitUSART1();
+//	USARTIO_InitUSART1();
   	LED_Init();  
 	ACC_Init();  
     STATE_Init();
@@ -32,11 +32,11 @@ int main()
 	printf("Init finished.\r\n");
 
 	while(1){
-//        PWR_EnterSLEEPMode();
-
+        PWR_EnterSLEEPMode();
+				/*
 		xl345Read(1, XL345_INT_ENABLE, &buf);
 		printf("%hhx\r\n", buf);
-        delay(1555356);
+        delay(1555356);*/
 	}
 }
 
