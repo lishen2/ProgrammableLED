@@ -192,10 +192,10 @@
 
 #define XL345_FIFO_TRIGGERED       0x80
 
-void xl345Init(void);
-void xl345Deinit(void);
-void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf);
-void xl345Write(unsigned char count, unsigned char regaddr, unsigned char *buf);
+void XL345_Init(void);
+void XL345_Deinit(void);
+void XL345_Read(unsigned char count, unsigned char regaddr, unsigned char* buf);
+void XL345_Write(unsigned char count, unsigned char regaddr, unsigned char *buf);
 
 #endif
 

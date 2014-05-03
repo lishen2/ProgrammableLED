@@ -3,18 +3,17 @@
 
 vu32 g_jiffies = 0;
 
-/* 公共的硬件初始化，当前仅初始化了外设总线 */
 void HW_CommonInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     
     /* set 2 bit preemptible */  
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-
-    /* We didn't use oscillator of any kind, so remap PD0,1 */
+    
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE); 
 
+	/* We didn't use oscillator of any kind, so remap PD0,1 */
     GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
 
     /* set PC13,14,15 to IPD */
@@ -41,12 +40,11 @@ void HW_InitSysTick(void)
         while (1);
     }  
     /* Configure the SysTick handler priority */
-    NVIC_SetPriority(SysTick_IRQn, 0x0);
+    NVIC_SetPriority(SysTick_IRQn, 0x00);
 
     return;
 }
 
-/* 毫秒级延时 */
 void delay_ms(int n)
 {
 	n += g_jiffies;

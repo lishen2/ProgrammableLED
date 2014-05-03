@@ -1,12 +1,12 @@
-#include <stdio.h>
 #include "stm32f10x.h"
 #include "xl345.h"
 
-/* 控制xl345 cs的GPIO引脚 */
+/* xl345 cs pin */
 #define XL345_CS_PIN   GPIO_Pin_0
 #define XL345_CS_PORT  GPIOB 
 #define XL345_CS_CLOCK RCC_APB2Periph_GPIOB
 
+/* spi port */
 #define XL345_COM_SPI       SPI1
 #define XL345_COM_PORT      GPIOA
 #define XL345_COM_RCC       RCC_APB2Periph_GPIOA
@@ -17,28 +17,28 @@
 #define XL345_DISABLE() GPIO_SetBits(XL345_CS_PORT, XL345_CS_PIN); 
 #define XL345_ENABLE()  GPIO_ResetBits(XL345_CS_PORT, XL345_CS_PIN);
 
-//SPIx 读写一个字节
-//返回值:读取到的字节
+/* read and write spi */
 static u8 _spi_ReadWriteByte(u8 TxData)
 {		
 	u8 retry=0;				 
-	while((XL345_COM_SPI->SR&1<<1)==0)//等待发送区空	
+	while((XL345_COM_SPI->SR&1<<1)==0)	
 	{
 		retry++;
 		if(retry>200)return 0;
 	}			  
 
-	XL345_COM_SPI->DR=TxData;	 	  //发送一个byte 
+	XL345_COM_SPI->DR=TxData;	 	  
 	retry=0;
-	while((XL345_COM_SPI->SR&1<<0)==0) //等待接收完一个byte  
+	while((XL345_COM_SPI->SR&1<<0)==0) 
 	{
 		retry++;
 		if(retry>200)return 0;
-	}	  						    
-	return XL345_COM_SPI->DR;          //返回收到的数据				    
+	}
+		  						    
+	return XL345_COM_SPI->DR;			    
 }
 
-void xl345Init(void)
+void XL345_Init(void)
 {
 	SPI_InitTypeDef  SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -86,13 +86,15 @@ void xl345Init(void)
 	return;	
 }
 
-void xl345Deinit(void)
+void XL345_Deinit(void)
 {
     SPI_Cmd(XL345_COM_SPI, DISABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, DISABLE);
+
+	return;
 }
 
-void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf)
+void XL345_Read(unsigned char count, unsigned char regaddr, unsigned char* buf)
 {
 	int i;
 
@@ -110,7 +112,7 @@ void xl345Read(unsigned char count, unsigned char regaddr, unsigned char* buf)
 	return;
 }
 
-void xl345Write(unsigned char count, unsigned char addr, unsigned char *buf)
+void XL345_Write(unsigned char count, unsigned char addr, unsigned char *buf)
 {
 	int i;
 

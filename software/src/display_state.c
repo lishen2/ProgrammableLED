@@ -3,32 +3,33 @@
 #include "display_state.h"
 #include "app_intf.h"
 #include "break_light.h"
-#include "alarm.h"
+#include "gradienter.h"
 
 static vs32 g_DisState;
 static u32 g_StateCount;
 
 void STATE_SetState(int state)
 {
+	/* if status not change, return */
     if (state == g_DisState){
         return;
     }
 
-    //stop old display mode
+    /* stop old display mode */
     switch(g_DisState){
         case STATE_BREAK_LIGHT:
         {
             g_appBreakLight.Stop();            
             break;
         }
-        case STATE_ALARM:
+        case STATE_GRADIENTER:
         {
-			g_appAlarm.Stop();
+			g_appGradienter.Stop();
             break;
         }        
     };
 
-    //start new display mode
+    /* start new display mode*/
   	g_DisState = state;
     switch(state){
         case STATE_BREAK_LIGHT:
@@ -36,9 +37,9 @@ void STATE_SetState(int state)
             g_appBreakLight.Start();
             break;
         }
-        case STATE_ALARM:
+        case STATE_GRADIENTER:
         {
-            g_appAlarm.Start();
+            g_appGradienter.Start();
             break;
         }        
     };

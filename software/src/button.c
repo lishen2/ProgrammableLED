@@ -135,12 +135,10 @@ void BTN_Deinit(void)
 void BTN_BUTTON_IRQROUTINE(void)
 {
 	if (SET == EXTI_GetITStatus(BTN_BUTTON_EXTILINE)){
-	
+		EXTI_ClearITPendingBit(BTN_BUTTON_EXTILINE);  	
 		//start timer	
 		TIM_SetCounter(BTN_ANTISHAKE_TIMER, BTN_ANTISHAEK_TIME);
-		TIM_Cmd(BTN_ANTISHAKE_TIMER, ENABLE);
-
-		EXTI_ClearITPendingBit(BTN_BUTTON_EXTILINE);        
+		TIM_Cmd(BTN_ANTISHAKE_TIMER, ENABLE);      
 	}	
 }
 
@@ -151,11 +149,11 @@ void BTN_ANTISHAKE_IRQROUTINE(void)
 
 		TIM_Cmd(BTN_ANTISHAKE_TIMER, DISABLE);
 
-		//check if the button is still pushed
+		//check if the button is still been pushed
 		if (Bit_SET == GPIO_ReadInputDataBit(BTN_BUTTON_PORT, BTN_BUTTON_PIN))
 		{
             PWR_Restore();
-			LED_SetColor(0x11010010);
+			STATE_NextState();
 		}
 	}//if	
 }

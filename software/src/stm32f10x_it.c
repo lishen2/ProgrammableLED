@@ -23,8 +23,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-#include "ringbuf.h"
-#include "usart_io.h"
 #include "utils.h"
 #include "led.h"
 
@@ -146,37 +144,6 @@ void SysTick_Handler(void)
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
 
-
-/**
-  * @brief  This function handles USART2 global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void USART1_IRQHandler(void)
-{
-  int ret;
-  unsigned char ch;
-  
-  if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
-  {
-    /* 从寄存其中读出数据放入读缓存中 */
-    Ringbuf_PutChar(&g_USAER1ReadBufHead, 
-                    (unsigned char)USART_ReceiveData(USART1));
-  }
-  
-  if(USART_GetITStatus(USART1, USART_IT_TXE) == SET)
-  { 
-    /* 从缓存中读取数据并写入寄存器 */
-    ret = Ringbuf_GetChar(&g_USAER1WriteBufHead, &ch);
-    if (ERROR_SUCCESS == ret){
-        USART_SendData(USART1, ch);  
-    }
-    /* 如果缓存为空则关闭中断 */
-    else {
-      USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-    }//else
-  }
-}
 
 /**
   * @brief  This function handles USART1 global interrupt request.

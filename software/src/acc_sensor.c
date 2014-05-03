@@ -1,10 +1,9 @@
-#include <stdio.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "acc_sensor.h"
 #include "xl345.h"
-#include "power.h"
 
+/* accelerate sensor interrupt pin */
 #define ACC_INT_PIN         GPIO_Pin_0
 #define ACC_INT_PORT        GPIOA
 #define ACC_INT_RCC         RCC_APB2Periph_GPIOA
@@ -14,7 +13,7 @@
 #define ACC_INT_IRQROUTINE  EXTI0_IRQHandler
 #define ACC_INT_EXTILINE    EXTI_Line0
 
-ACC_IRQHandler g_handler = NULL;
+static ACC_IRQHandler g_handler = NULL;
 
 static void _initInterrupt(void)
 {
@@ -47,12 +46,13 @@ static void _initInterrupt(void)
 
 void ACC_Init(void)
 {
-    xl345Init();
+    XL345_Init();
 	_initInterrupt();
 
     return;
 }
 
+/* read accelerate from sensor queue */
 void ACC_ReadAcc(u8 fifoLen, s16 *X, s16 *Y, s16*Z)
 {
 	u8 buf[6];
@@ -65,7 +65,7 @@ void ACC_ReadAcc(u8 fifoLen, s16 *X, s16 *Y, s16*Z)
     avZ = 0;
     
     for (i = 0; i < fifoLen; ++i){
-        xl345Read(sizeof(buf), XL345_DATAX0, buf);
+        XL345_Read(sizeof(buf), XL345_DATAX0, buf);
         x = (buf[1] << 8 | buf[0]);
         y = (buf[3] << 8 | buf[2]);        
         z = (buf[5] << 8 | buf[4]);             
@@ -85,6 +85,8 @@ void ACC_ReadAcc(u8 fifoLen, s16 *X, s16 *Y, s16*Z)
 void ACC_SetIRQHandler(ACC_IRQHandler handler)
 {
 	g_handler = handler;
+
+	return;
 }
 
 void ACC_INT_IRQROUTINE(void)
@@ -92,16 +94,17 @@ void ACC_INT_IRQROUTINE(void)
 	u8 irq;
 
 	if (SET == EXTI_GetITStatus(ACC_INT_EXTILINE)){
+		EXTI_ClearITPendingBit(ACC_INT_EXTILINE);  
 
 	    /* read int source */
-		xl345Read(1, XL345_INT_SOURCE, &irq);
+		XL345_Read(1, XL345_INT_SOURCE, &irq);
 
 		/* call handler */
 		if (NULL != g_handler){
 			g_handler(irq);
-		}
-        
-		EXTI_ClearITPendingBit(ACC_INT_EXTILINE);        
-	}	
+		}      
+	}
+	
+	return;	
 }
 

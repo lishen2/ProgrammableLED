@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "break_light.h"
@@ -10,39 +9,22 @@
 
 enum BKL_Status{
     BKL_STATUS_CONSTANTSPEED,
-    BKL_LED_ACCELERATION,
-    BKL_LED_DECELERATION,
+    BKL_STATUS_DECELERATION,
 };
 
 #define BKL_TIMER          TIM3
 #define BKL_TIM_RCC        RCC_APB1Periph_TIM3
 #define BKL_TIM_IRQ        TIM3_IRQn
 #define BKL_TIM_ROUTINE    TIM3_IRQHandler
-#define BKL_TIMER_DELAY    1000
+#define BKL_TIMER_DELAY    200
 
 #define BKL_FIFO_LENGTH    16
 
 #define BKL_TURNLIGHT_MASK   0x000F00F0
-#define BKL_CLEAR_TURNLIGHT(color)  (color &= ~BKL_TURNLIGHT_MASK)
 #define BKL_CLEAR_BREAKLIGHT(color) (color &= BKL_TURNLIGHT_MASK)
-
-#define BKL_LED_TURNLEFT()  BKL_CLEAR_TURNLIGHT(g_ledColor);\
-                            g_ledColor |= 0x00000050;\
-                            LED_SetColor(g_ledColor);
-
-#define BKL_LED_TURNRIGHT()  BKL_CLEAR_TURNLIGHT(g_ledColor);\
-                             g_ledColor |= 0x00050000;\
-                             LED_SetColor(g_ledColor);
-
-#define BKL_LED_STRAIGHTAHEAD() BKL_CLEAR_TURNLIGHT(g_ledColor);\
-                                LED_SetColor(g_ledColor);
 
 #define BKL_LED_DECELERATION()  BKL_CLEAR_BREAKLIGHT(g_ledColor);\
                                 g_ledColor |= 0xFF00F00F;\
-                                LED_SetColor(g_ledColor);
-
-#define BKL_LED_ACCELERATION()  BKL_CLEAR_BREAKLIGHT(g_ledColor);\
-                                g_ledColor |= 0x00A01A01;\
                                 LED_SetColor(g_ledColor);
 
 #define BKL_LED_CONSTANTSPEED()  BKL_CLEAR_BREAKLIGHT(g_ledColor);  \
@@ -51,8 +33,11 @@ enum BKL_Status{
 
 static u32 g_ledColor;
 static s16 g_lastZ;
+static s16 g_lastX;
+static s16 g_lastY;
 
-static vs32 g_status = BKL_STATUS_CONSTANTSPEED;
+static vs32 g_displayStatus = BKL_STATUS_CONSTANTSPEED;
+static vs32 g_dectectStatus = BKL_STATUS_CONSTANTSPEED;
 
 static void _BKL_Start(void);
 static void _BKL_Stop(void);
@@ -106,8 +91,11 @@ static void _bklTimerDeinit(void)
     return;
 }
 
-static void _startTimer(void)
+static void _displayDeceleration(void)
 {
+    g_displayStatus = BKL_STATUS_DECELERATION;
+    BKL_LED_DECELERATION();
+
 	TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
 	TIM_Cmd(BKL_TIMER, ENABLE);
 
@@ -118,47 +106,47 @@ void BKL_TIM_ROUTINE(void)
 {
     if(TIM_GetITStatus(BKL_TIMER, TIM_IT_Update) != RESET){
         TIM_ClearITPendingBit(BKL_TIMER , TIM_FLAG_Update);
-       	TIM_Cmd(BKL_TIMER, DISABLE);
-        BKL_LED_CONSTANTSPEED();
-        g_status = BKL_STATUS_CONSTANTSPEED;
+
+		/* if still deceleration */
+		if (BKL_STATUS_DECELERATION == g_dectectStatus){
+			TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
+			TIM_Cmd(BKL_TIMER, ENABLE);		
+		} 
+		/* if not decelerateion */
+		else {
+	       	TIM_Cmd(BKL_TIMER, DISABLE);
+	        BKL_LED_CONSTANTSPEED();
+	        g_displayStatus = BKL_STATUS_CONSTANTSPEED;		
+		}
     }
+
+	return;
 }
 
-static void _onDataReady(void)
+static void _BKLonDataReady(void)
 {
     s16 x, y, z;
-    s16 zDiff;
+    s16 zDiff, xDiff, yDiff;
 
     ACC_ReadAcc(BKL_FIFO_LENGTH, &x, &y, &z);
-//    printf("X:%hd Y:%hd Z:%hd\r\n", x, y, z);
 
-    /* Z axis calculate */
     zDiff = z - g_lastZ;
-    /* zDiff is positive means we are decelerate */
-    if (zDiff >= 20){
-        if (BKL_STATUS_CONSTANTSPEED == g_status){
-            g_status = BKL_LED_DECELERATION;
-            BKL_LED_DECELERATION();
-            _startTimer();
-        }        
-    } 
-    /* zDiff is negative means we are accelerate */
-    /*
-    else if (zDiff < -15){
-        BKL_LED_ACCELERATION();
-    }*/
-    
-    g_lastZ = z;
+	xDiff = x - g_lastX;
+	yDiff = y - g_lastY;
 
-    /* Y axis calculate */
-    /*
-    if (y > 20){
-        BKL_LED_TURNRIGHT();
-    } else if (y < -20){
-        BKL_LED_TURNLEFT();
+    /* zDiff is positive means we are decelerate */
+    if ((zDiff >= 20 && xDiff < 50 && yDiff < 50) || 
+		zDiff >= 40){
+		g_dectectStatus = BKL_STATUS_DECELERATION;
+
+        if (BKL_STATUS_CONSTANTSPEED == g_displayStatus){
+			_displayDeceleration();
+        }		        
     } else {
-        BKL_LED_STRAIGHTAHEAD();
-    }*/
+		g_dectectStatus = BKL_STATUS_CONSTANTSPEED;
+	} 
+   
+    g_lastZ = z;
     
     return;
 }
@@ -167,20 +155,16 @@ static void _BKLIRQHandler(u8 irq)
 {
     /* if data is ready */
     if (irq & XL345_WATERMARK){
-        _onDataReady();
+        _BKLonDataReady();
     }
 
     /* wake up */
-    if (irq & XL345_ACTIVITY) {
-        printf("Activity.\r\n");    
-        //_bklTimerInit();
+    if (irq & XL345_ACTIVITY) {    
         PWR_Restore();        
     }
 
     /* into low power mode */
     if (irq & XL345_INACTIVITY){
-        printf("Inactivity.\r\n");
-        //_bklTimerDeinit();
         PWR_LowPower();
     }
     
@@ -192,7 +176,7 @@ static void _BKLInitAccSensor(void)
     u8 buffer[8];
     /* add software reset */
 	buffer[0] = XL345_SOFT_RESET;
-	xl345Write(1, XL345_RESERVED1, buffer);
+	XL345_Write(1, XL345_RESERVED1, buffer);
 
 	delay_ms(50);
 
@@ -208,7 +192,7 @@ static void _BKLInitAccSensor(void)
                 | XL345_ACT_X_ENABLE | XL345_ACT_Y_ENABLE | XL345_ACT_Z_ENABLE
                 | XL345_INACT_AC | XL345_INACT_X_ENABLE 
                 | XL345_INACT_Y_ENABLE | XL345_INACT_Z_ENABLE;
-    xl345Write(4, XL345_THRESH_ACT, buffer);
+    XL345_Write(4, XL345_THRESH_ACT, buffer);
 
     /*--------------------------------------------------
     Power, bandwidth-rate, interupt enabling
@@ -220,27 +204,27 @@ static void _BKLInitAccSensor(void)
     buffer[1] =                   /* POWER_CTL */
                 XL345_ACT_INACT_SERIAL | XL345_AUTO_SLEEP |
                 XL345_WAKEUP_8HZ | XL345_MEASURE;
-    xl345Write(2, XL345_BW_RATE, buffer);
+    XL345_Write(2, XL345_BW_RATE, buffer);
 
     // set the FIFO control
     buffer[0] = XL345_FIFO_MODE_FIFO    | // set FIFO mode
             	0 | 		             // link to INT1
             	BKL_FIFO_LENGTH;		 // number of samples
-    xl345Write(1, XL345_FIFO_CTL, buffer);
+    XL345_Write(1, XL345_FIFO_CTL, buffer);
 
     // set data format
     buffer[0] = XL345_SPI4WIRE | XL345_INT_HIGH | XL345_10BIT |
                 XL345_DATA_JUST_RIGHT | XL345_RANGE_2G;
-    xl345Write(1, XL345_DATA_FORMAT, buffer);
+    XL345_Write(1, XL345_DATA_FORMAT, buffer);
 
     //set interrupt map
     buffer[0] = 0; //all interrupts set to pin INT1
-    xl345Write(1, XL345_INT_MAP, buffer);		
+    XL345_Write(1, XL345_INT_MAP, buffer);		
     
     // turn on the interrupts
     buffer[0] = XL345_ACTIVITY | XL345_INACTIVITY | 
                 XL345_WATERMARK;
-    xl345Write(1, XL345_INT_ENABLE, buffer);
+    XL345_Write(1, XL345_INT_ENABLE, buffer);
 
     return;
 }
@@ -250,7 +234,7 @@ static void _BKLDeinitAccSensor(void)
 	u8 reset = XL345_SOFT_RESET;
 
     /* just reset */
-	xl345Write(1, XL345_RESERVED1, &reset);
+	XL345_Write(1, XL345_RESERVED1, &reset);
 	delay_ms(50);
 
     return;
