@@ -8,9 +8,9 @@
 #include "power.h"
 
 int main()
-{
-	HW_CommonInit();
+{	
     PWR_SetUnusedPin2IPD();
+	HW_CommonInit();
   	LED_Init();
 	HW_InitSysTick();  
 	ACC_Init();  

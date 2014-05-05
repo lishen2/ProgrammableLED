@@ -12704,10 +12704,8 @@ We've spent an enormous amount of time creating and checking these footprints an
 <segment>
 <pinref part="SUPPLY3" gate="G$1" pin="3.3V"/>
 <wire x1="-10.16" y1="-45.72" x2="-10.16" y2="-50.8" width="0.1524" layer="91"/>
-<wire x1="-10.16" y1="-50.8" x2="-10.16" y2="-53.34" width="0.1524" layer="91"/>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="-2.54" y1="-50.8" x2="-5.08" y2="-50.8" width="0.1524" layer="91"/>
-<junction x="-10.16" y="-50.8"/>
 <pinref part="R4" gate="G$1" pin="1"/>
 <wire x1="-5.08" y1="-50.8" x2="-10.16" y2="-50.8" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="-43.18" x2="-5.08" y2="-43.18" width="0.1524" layer="91"/>
