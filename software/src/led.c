@@ -27,7 +27,7 @@
 
 /* led power control pin */
 #define LED_POWER_PORT_RCC RCC_APB2Periph_GPIOA
-#define LED_POWER_PORT     GPIOB
+#define LED_POWER_PORT     GPIOA
 #define LED_POWER_PIN      GPIO_Pin_3
 
 /* store led color */
@@ -49,17 +49,17 @@ void LED_Init(void)
     /* disable JTAG, leave only SWD, we use PB4 as LED2 Blue */
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
-	/* init boost circuit control pin */
+	/* init led control pin */
 	GPIO_InitStructure.GPIO_Pin = LED_ALL_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(LED_PORT, &GPIO_InitStructure);
     LED_LIGHTSHUT(LED_PORT, LED_ALL_PIN);
 
-	/* init led control pin */
+	/* init boost circuit control pin */
 	GPIO_InitStructure.GPIO_Pin = LED_POWER_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(LED_POWER_PORT, &GPIO_InitStructure);
     GPIO_SetBits(LED_POWER_PORT, LED_POWER_PIN);
 

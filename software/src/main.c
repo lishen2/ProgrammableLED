@@ -5,10 +5,12 @@
 #include "button.h"
 #include "led.h"
 #include "xl345.h"
+#include "power.h"
 
 int main()
 {
 	HW_CommonInit();
+    PWR_SetUnusedPin2IPD();
   	LED_Init();
 	HW_InitSysTick();  
 	ACC_Init();  

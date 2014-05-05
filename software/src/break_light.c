@@ -20,8 +20,7 @@ enum BKL_Status{
 
 #define BKL_FIFO_LENGTH    16
 
-#define BKL_TURNLIGHT_MASK   0x000F00F0
-#define BKL_CLEAR_BREAKLIGHT(color) (color &= BKL_TURNLIGHT_MASK)
+#define BKL_CLEAR_BREAKLIGHT(color) (color &= 0x00FF0FF0)
 
 #define BKL_LED_DECELERATION()  BKL_CLEAR_BREAKLIGHT(g_ledColor);\
                                 g_ledColor |= 0xFF00F00F;\
@@ -147,6 +146,8 @@ static void _BKLonDataReady(void)
 	} 
    
     g_lastZ = z;
+	g_lastX = x;
+	g_lastY = y;
     
     return;
 }
