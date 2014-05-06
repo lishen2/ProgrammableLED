@@ -52,7 +52,7 @@ void LED_Init(void)
 	/* init led control pin */
 	GPIO_InitStructure.GPIO_Pin = LED_ALL_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(LED_PORT, &GPIO_InitStructure);
     LED_LIGHTSHUT(LED_PORT, LED_ALL_PIN);
 
