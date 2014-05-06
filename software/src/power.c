@@ -9,8 +9,8 @@ void PWR_SetUnusedPin(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
-    
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);  
+
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 
@@ -25,25 +25,6 @@ void PWR_SetUnusedPin(void)
                                   GPIO_Pin_10 | GPIO_Pin_11;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    /* close all debug port */
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
-    
-    /* SET SWD PIN PA13 PA14 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_14;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    /* SET JTAG PIN PA15, PB3, PB4 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3|GPIO_Pin_4;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
     
     return;
 }

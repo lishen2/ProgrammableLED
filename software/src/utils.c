@@ -11,7 +11,7 @@ void HW_CommonInit(void)
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); 
 
 	/* We didn't use oscillator of any kind, so remap PD0,1 */
     GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
