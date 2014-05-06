@@ -9,7 +9,7 @@
 
 int main()
 {	
-    PWR_SetUnusedPin2IPD();
+    PWR_SetUnusedPin();
 	HW_CommonInit();
   	LED_Init();
 	HW_InitSysTick();  
