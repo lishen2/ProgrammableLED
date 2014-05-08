@@ -34,7 +34,7 @@ static void _gradInitAccSensor(void)
     buffer[0] = 20; 
     buffer[1] = 5; 
     buffer[2] = 5;/* TIME_INACT - 5 seconds */
-    buffer[3] =     /* ACT_INACT_CTL */
+    buffer[3] =  /* ACT_INACT_CTL */
                 XL345_ACT_DC 
                 | XL345_ACT_X_ENABLE | XL345_ACT_Y_ENABLE | XL345_ACT_Z_ENABLE
                 | XL345_INACT_AC | XL345_INACT_X_ENABLE 
@@ -86,29 +86,6 @@ static void _gradDeinitAccSensor(void)
 
     return;
 }
-/*
-static void _gradSetupColor(u16 level, u32* pcolor){
-	u32 color = 0;
-	
-	if (level > 0xFFF) {
-		level = 0xFFF;
-	}
-
-	if (level <= 0x0F){
-		LED2_SET_GREEN(color, level);
-	} else if (level > 0x0F && level <= 0xFF) {
-		LED2_SET_GREEN(color, 1);	
-		LED2_SET_BLUE(color, level >> 4);
-	} else {
-		LED2_SET_GREEN(color, 1);	
-		LED2_SET_BLUE(color, 1);
-		LED2_SET_RED(color, level >> 8);		
-	}
-
-	*pcolor = color;
-
-	return;
-} */
 
 static void _gradOnDataReady(void)
 {

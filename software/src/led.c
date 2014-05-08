@@ -59,7 +59,7 @@ void LED_Init(void)
 	/* init boost circuit control pin */
 	GPIO_InitStructure.GPIO_Pin = LED_POWER_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(LED_POWER_PORT, &GPIO_InitStructure);
     GPIO_SetBits(LED_POWER_PORT, LED_POWER_PIN);
 

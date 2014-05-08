@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "stm32f10x.h"
 #include "utils.h"
 #include "break_light.h"
@@ -18,7 +19,7 @@ enum BKL_Status{
 #define BKL_TIM_ROUTINE    TIM3_IRQHandler
 #define BKL_TIMER_DELAY    200
 
-#define BKL_FIFO_LENGTH    16
+#define BKL_FIFO_LENGTH    8
 
 #define BKL_CLEAR_BREAKLIGHT(color) (color &= 0x00FF0FF0)
 
@@ -31,12 +32,11 @@ enum BKL_Status{
                                  LED_SetColor(g_ledColor);
 
 static u32 g_ledColor;
-static s16 g_lastZ;
-static s16 g_lastX;
-static s16 g_lastY;
 
-static vs32 g_displayStatus = BKL_STATUS_CONSTANTSPEED;
-static vs32 g_dectectStatus = BKL_STATUS_CONSTANTSPEED;
+static s32 g_totalZ = 0;
+static s32 g_totalX = 0;
+static s32 g_totalY = 0;
+static s32 g_count = 0;
 
 static void _BKL_Start(void);
 static void _BKL_Stop(void);
@@ -90,9 +90,8 @@ static void _bklTimerDeinit(void)
     return;
 }
 
-static void _displayDeceleration(void)
+static inline void _displayDeceleration(void)
 {
-    g_displayStatus = BKL_STATUS_DECELERATION;
     BKL_LED_DECELERATION();
 
 	TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
@@ -104,19 +103,10 @@ static void _displayDeceleration(void)
 void BKL_TIM_ROUTINE(void)
 {
     if(TIM_GetITStatus(BKL_TIMER, TIM_IT_Update) != RESET){
-        TIM_ClearITPendingBit(BKL_TIMER , TIM_FLAG_Update);
+       TIM_ClearITPendingBit(BKL_TIMER , TIM_FLAG_Update);
 
-		/* if still deceleration */
-		if (BKL_STATUS_DECELERATION == g_dectectStatus){
-			TIM_SetCounter(BKL_TIMER, BKL_TIMER_DELAY);
-			TIM_Cmd(BKL_TIMER, ENABLE);		
-		} 
-		/* if not decelerateion */
-		else {
-	       	TIM_Cmd(BKL_TIMER, DISABLE);
-	        BKL_LED_CONSTANTSPEED();
-	        g_displayStatus = BKL_STATUS_CONSTANTSPEED;		
-		}
+       	TIM_Cmd(BKL_TIMER, DISABLE);
+        BKL_LED_CONSTANTSPEED();
     }
 
 	return;
@@ -125,30 +115,31 @@ void BKL_TIM_ROUTINE(void)
 static void _BKLonDataReady(void)
 {
     s16 x, y, z;
-    s16 zDiff, xDiff, yDiff;
+	s16 zDiff, xDiff, yDiff;
 
     ACC_ReadAcc(BKL_FIFO_LENGTH, &x, &y, &z);
 
-    zDiff = z - g_lastZ;
-	xDiff = x - g_lastX;
-	yDiff = y - g_lastY;
+	g_count += 1;
+	g_totalZ += z; 
+	zDiff = z - g_totalZ/g_count;
+	g_totalX += x;
+	xDiff = abs(x - g_totalX/g_count);
+	g_totalY += y;
+	yDiff = abs(y - g_totalY/g_count);
 
     /* zDiff is positive means we are decelerate */
     if ((zDiff >= 20 && xDiff < 50 && yDiff < 50) || 
 		zDiff >= 40){
-		g_dectectStatus = BKL_STATUS_DECELERATION;
+		_displayDeceleration();		        
+    }
 
-        if (BKL_STATUS_CONSTANTSPEED == g_displayStatus){
-			_displayDeceleration();
-        }		        
-    } else {
-		g_dectectStatus = BKL_STATUS_CONSTANTSPEED;
-	} 
-   
-    g_lastZ = z;
-	g_lastX = x;
-	g_lastY = y;
-    
+	if (g_count > 512){
+		g_count >>= 3;
+		g_totalZ >>= 3;
+		g_totalX >>= 3;
+		g_totalY >>= 3;
+	}
+
     return;
 }
 
@@ -185,9 +176,9 @@ static void _BKLInitAccSensor(void)
     activity - inactivity 
     --------------------------------------------------*/
     /* set up a buffer with all the initialization for activity and inactivity */
-    buffer[0] = 20; /* THRESH_ACT = 80/16 = 5 Gee (1 lsb = 1/16 gee) */
+    buffer[0] = 15; /* THRESH_ACT = 80/16 = 5 Gee (1 lsb = 1/16 gee) */
     buffer[1] = 5; /* THRESH_INACT = 14/16 .25 Gee (1 lsb = 1/16 gee) */
-    buffer[2] = 5;/* TIME_INACT - 5 seconds */
+    buffer[2] = 20;/* TIME_INACT - 5 seconds */
     buffer[3] =     /* ACT_INACT_CTL */
                 XL345_ACT_DC 
                 | XL345_ACT_X_ENABLE | XL345_ACT_Y_ENABLE | XL345_ACT_Z_ENABLE
@@ -201,7 +192,7 @@ static void _BKLInitAccSensor(void)
 
     /* set up a buffer with all the initization for power*/
     buffer[0] =                   /* BW_RATE */
-                XL345_RATE_200 | XL345_LOW_NOISE;
+                XL345_RATE_100 | XL345_LOW_NOISE;
     buffer[1] =                   /* POWER_CTL */
                 XL345_ACT_INACT_SERIAL | XL345_AUTO_SLEEP |
                 XL345_WAKEUP_8HZ | XL345_MEASURE;

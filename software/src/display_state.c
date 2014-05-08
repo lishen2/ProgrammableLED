@@ -6,56 +6,52 @@
 #include "gradienter.h"
 
 static vs32 g_DisState;
-static u32 g_StateCount;
+
+static void _dummy(void) {};
+static struct APP_INTF g_dummyApp = {
+	_dummy, _dummy
+};
+static struct APP_INTF* g_curApp = &g_dummyApp;
 
 void STATE_SetState(int state)
 {
-	/* if status not change, return */
-    if (state == g_DisState){
-        return;
-    }
+    /* stop old app */
+    g_curApp->Stop();            
 
-    /* stop old display mode */
-    switch(g_DisState){
-        case STATE_BREAK_LIGHT:
-        {
-            g_appBreakLight.Stop();            
-            break;
-        }
-        case STATE_GRADIENTER:
-        {
-			g_appGradienter.Stop();
-            break;
-        }        
-    };
-
-    /* start new display mode*/
-  	g_DisState = state;
+    /* set new state*/
     switch(state){
         case STATE_BREAK_LIGHT:
         {
-            g_appBreakLight.Start();
+            g_curApp = &g_appBreakLight;
             break;
         }
         case STATE_GRADIENTER:
         {
-            g_appGradienter.Start();
+            g_curApp = &g_appGradienter;
             break;
-        }        
+        }  
+		default:
+		{
+			g_curApp = &g_dummyApp;
+			break;
+		}      
     };
+
+	/* start new app */
+	g_curApp->Start();
 
 	return;
 }
 
 void STATE_NextState(void)
 {
-    g_StateCount++;
+    g_DisState++;
     
-	if (STATE_MAX == g_StateCount){
-		g_StateCount = STATE_BREAK_LIGHT;
+	if (STATE_MAX == g_DisState){
+		g_DisState = STATE_BREAK_LIGHT;
 	}
 
-	STATE_SetState(g_StateCount);
+	STATE_SetState(g_DisState);
 
 	return;
 }
@@ -63,7 +59,7 @@ void STATE_NextState(void)
 void STATE_Init(void)
 {
   	g_DisState = STATE_BREAK_LIGHT; 
-	g_StateCount = STATE_BREAK_LIGHT;     
+	g_curApp = &g_appBreakLight;  
     g_appBreakLight.Start();
 
 	return;
