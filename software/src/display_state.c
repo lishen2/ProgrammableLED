@@ -4,6 +4,7 @@
 #include "app_intf.h"
 #include "break_light.h"
 #include "gradienter.h"
+#include "color_light.h"
 
 static vs32 g_DisState;
 
@@ -13,7 +14,7 @@ static struct APP_INTF g_dummyApp = {
 };
 static struct APP_INTF* g_curApp = &g_dummyApp;
 
-void STATE_SetState(int state)
+void STATE_SetState(enum DISPLAY_STATE state)
 {
     /* stop old app */
     g_curApp->Stop();            
@@ -29,7 +30,12 @@ void STATE_SetState(int state)
         {
             g_curApp = &g_appGradienter;
             break;
-        }  
+        } 
+		case STATE_COLORLIGHT:
+		{
+			g_curApp = &g_appColorLight;
+			break;
+		}
 		default:
 		{
 			g_curApp = &g_dummyApp;
@@ -51,7 +57,7 @@ void STATE_NextState(void)
 		g_DisState = STATE_BREAK_LIGHT;
 	}
 
-	STATE_SetState(g_DisState);
+	STATE_SetState((enum DISPLAY_STATE)g_DisState);
 
 	return;
 }

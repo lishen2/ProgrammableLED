@@ -47,7 +47,7 @@ void LED_Init(void)
 	RCC_APB2PeriphClockCmd(LED_RCC | LED_POWER_PORT_RCC, ENABLE);
 
     /* disable JTAG, leave only SWD, we use PB4 as LED2 Blue */
-    /* ALL debug pin disabled at startup */
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
 	/* init led control pin */
 	GPIO_InitStructure.GPIO_Pin = LED_ALL_PIN;

@@ -31,10 +31,10 @@ static void _gradInitAccSensor(void)
     activity - inactivity 
     --------------------------------------------------*/
     /* set up a buffer with all the initialization for activity and inactivity */
-    buffer[0] = 20; 
-    buffer[1] = 5; 
-    buffer[2] = 5;/* TIME_INACT - 5 seconds */
-    buffer[3] =  /* ACT_INACT_CTL */
+    buffer[0] = 20; /* THRESH_ACT */
+    buffer[1] = 5; /* THRESH_INACT */
+    buffer[2] = 10;/* TIME_INACT (seconds) */
+    buffer[3] =     /* ACT_INACT_CTL */
                 XL345_ACT_DC 
                 | XL345_ACT_X_ENABLE | XL345_ACT_Y_ENABLE | XL345_ACT_Z_ENABLE
                 | XL345_INACT_AC | XL345_INACT_X_ENABLE 

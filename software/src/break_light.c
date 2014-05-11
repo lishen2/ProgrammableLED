@@ -17,7 +17,7 @@ enum BKL_Status{
 #define BKL_TIM_RCC        RCC_APB1Periph_TIM3
 #define BKL_TIM_IRQ        TIM3_IRQn
 #define BKL_TIM_ROUTINE    TIM3_IRQHandler
-#define BKL_TIMER_DELAY    200
+#define BKL_TIMER_DELAY    400
 
 #define BKL_FIFO_LENGTH    8
 
@@ -176,9 +176,9 @@ static void _BKLInitAccSensor(void)
     activity - inactivity 
     --------------------------------------------------*/
     /* set up a buffer with all the initialization for activity and inactivity */
-    buffer[0] = 15; /* THRESH_ACT = 80/16 = 5 Gee (1 lsb = 1/16 gee) */
-    buffer[1] = 5; /* THRESH_INACT = 14/16 .25 Gee (1 lsb = 1/16 gee) */
-    buffer[2] = 20;/* TIME_INACT - 5 seconds */
+    buffer[0] = 20; /* THRESH_ACT */
+    buffer[1] = 5; /* THRESH_INACT */
+    buffer[2] = 20;/* TIME_INACT (seconds) */
     buffer[3] =     /* ACT_INACT_CTL */
                 XL345_ACT_DC 
                 | XL345_ACT_X_ENABLE | XL345_ACT_Y_ENABLE | XL345_ACT_Z_ENABLE
@@ -234,6 +234,11 @@ static void _BKLDeinitAccSensor(void)
 
 static void _BKL_Start(void)
 {
+	g_count = 0;
+	g_totalZ = 0;
+	g_totalX = 0;
+	g_totalY = 0;
+
     _bklTimerInit();
 
     /* register irq handler to acc module */
