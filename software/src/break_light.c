@@ -128,8 +128,8 @@ static void _BKLonDataReady(void)
 	yDiff = abs(y - g_totalY/g_count);
 
     /* zDiff is positive means we are decelerate */
-    if ((zDiff >= 20 && xDiff < 50 && yDiff < 50) || 
-		zDiff >= 40){
+    if ((zDiff >= 25 && xDiff < 40 && yDiff < 40) || 
+		zDiff >= 45){
 		_displayDeceleration();		        
     }
 
@@ -234,11 +234,6 @@ static void _BKLDeinitAccSensor(void)
 
 static void _BKL_Start(void)
 {
-	g_count = 0;
-	g_totalZ = 0;
-	g_totalX = 0;
-	g_totalY = 0;
-
     _bklTimerInit();
 
     /* register irq handler to acc module */
