@@ -128,8 +128,8 @@ static void _BKLonDataReady(void)
 	yDiff = abs(y - g_totalY/g_count);
 
     /* zDiff is positive means we are decelerate */
-    if ((zDiff >= 25 && xDiff < 40 && yDiff < 40) || 
-		zDiff >= 45){
+    if ((zDiff >= 20 && xDiff < 15 && yDiff < 15) || 
+		zDiff >= 100){
 		_displayDeceleration();		        
     }
 

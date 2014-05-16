@@ -30,6 +30,7 @@
 20140329: 第二版PCB制作完成，放弃USB接口，增加加速度传感器ADXL234和升压电路（保证LED亮度一致）                    
 20140410：还在编写软件，放弃编程功能，仅留下刹车灯功能。                   
 20140506：基本功能正常，正在优化功耗。
+20140515：耗降到66微安，正在调整对加速度数值的处理。
 
 开发博客
 --------
@@ -66,6 +67,7 @@ Current progress
 20140329: Finished second PCB, abandon USB port, add ADXL234 sensor, and boost circuit.           
 20140410：Still working on software, just break light.            
 20140506：Barely work, working on reduce power consumption.
+20140515：Standby power consumption down to 66 mA, Adjusting processing logic about acceleration value.
 
 Development blog
 ---------------
