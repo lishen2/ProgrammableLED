@@ -21,17 +21,8 @@ enum BKL_Status{
 
 #define BKL_FIFO_LENGTH    8
 
-#define BKL_CLEAR_BREAKLIGHT(color) (color &= 0x00FF0FF0)
-
-#define BKL_LED_DECELERATION()  BKL_CLEAR_BREAKLIGHT(g_ledColor);\
-                                g_ledColor |= 0xFF00F00F;\
-                                LED_SetColor(g_ledColor);
-
-#define BKL_LED_CONSTANTSPEED()  BKL_CLEAR_BREAKLIGHT(g_ledColor);  \
-                                 g_ledColor |= 0x00001001;\
-                                 LED_SetColor(g_ledColor);
-
-static u32 g_ledColor;
+#define BKL_LED_DECELERATION()  LED_SetColor(0xFF00F00F);
+#define BKL_LED_CONSTANTSPEED() LED_SetColor(0x00011011);
 
 static s32 g_totalZ = 0;
 static s32 g_totalX = 0;
@@ -127,9 +118,12 @@ static void _BKLonDataReady(void)
 	g_totalY += y;
 	yDiff = abs(y - g_totalY/g_count);
 
+//	printf("X:%hd,Y:%hd,Z:%hd\r\n", x, y, z);
+//	printf("Xd:%hd,Yd:%hd,Zd:%hd\r\n", xDiff, yDiff, zDiff);
+
     /* zDiff is positive means we are decelerate */
-    if ((zDiff >= 20 && xDiff < 15 && yDiff < 15) || 
-		zDiff >= 100){
+    if ((zDiff >= 20 && xDiff < 30 && yDiff < 30) || 
+		zDiff >= 250){
 		_displayDeceleration();		        
     }
 
