@@ -122,7 +122,7 @@ static void _BKLonDataReady(void)
 //	printf("Xd:%hd,Yd:%hd,Zd:%hd\r\n", xDiff, yDiff, zDiff);
 
     /* zDiff is positive means we are decelerate */
-    if ((zDiff >= 20 && xDiff < 30 && yDiff < 30) || 
+    if ((zDiff >= 23 && xDiff < 25 && yDiff < 25) || 
 		zDiff >= 250){
 		_displayDeceleration();		        
     }
