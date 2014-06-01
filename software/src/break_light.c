@@ -19,7 +19,7 @@ enum BKL_Status{
 #define BKL_TIM_ROUTINE    TIM3_IRQHandler
 #define BKL_TIMER_DELAY    400
 
-#define BKL_FIFO_LENGTH    8
+#define BKL_FIFO_LENGTH   12
 
 #define BKL_LED_DECELERATION()  LED_SetColor(0xFF00F00F);
 #define BKL_LED_CONSTANTSPEED() LED_SetColor(0x00011011);
@@ -122,8 +122,9 @@ static void _BKLonDataReady(void)
 //	printf("Xd:%hd,Yd:%hd,Zd:%hd\r\n", xDiff, yDiff, zDiff);
 
     /* zDiff is positive means we are decelerate */
-    if ((zDiff >= 23 && xDiff < 25 && yDiff < 25) || 
-		zDiff >= 250){
+    if ((zDiff >= 23 && xDiff < 19 && yDiff < 19) || 
+		 zDiff >= 50 && xDiff < 90 && yDiff < 90 ||
+		 zDiff >= 90){
 		_displayDeceleration();		        
     }
 
